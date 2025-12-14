@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,9 +36,29 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = null;
+        
+        // Try to get user from JWT token in session
+        try {
+            $token = session('jwt_token');
+            if ($token) {
+                JWTAuth::setToken($token);
+                $user = JWTAuth::authenticate();
+            }
+        } catch (\Exception $e) {
+            // Token invalid or expired
+        }
+
         return [
             ...parent::share($request),
-            //
+            'auth' => [
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role ? $user->role->name : null,
+                ] : null,
+            ],
         ];
     }
 }
