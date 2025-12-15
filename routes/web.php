@@ -29,4 +29,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Admin Routes
 Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Mahasiswa CRUD
+    Route::resource('mahasiswa', \App\Http\Controllers\Admin\MahasiswaController::class);
+    Route::post('mahasiswa/import', [\App\Http\Controllers\Admin\MahasiswaController::class, 'import'])->name('mahasiswa.import');
+    Route::get('mahasiswa/template/download', [\App\Http\Controllers\Admin\MahasiswaController::class, 'downloadTemplate'])->name('mahasiswa.template');
+    
+    // Dosen CRUD
+    Route::resource('dosen', \App\Http\Controllers\Admin\DosenController::class);
+    Route::post('dosen/import', [\App\Http\Controllers\Admin\DosenController::class, 'import'])->name('dosen.import');
+    Route::get('dosen/template/download', [\App\Http\Controllers\Admin\DosenController::class, 'downloadTemplate'])->name('dosen.template');
 });

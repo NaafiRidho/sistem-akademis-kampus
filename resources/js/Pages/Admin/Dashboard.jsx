@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { usePage, router } from '@inertiajs/react';
+import { usePage, router, Head } from '@inertiajs/react';
+import Sidebar from '@/Components/Layout/Sidebar';
+import Header from '@/Components/Layout/Header';
 
 export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
     const { auth } = usePage().props;
@@ -13,7 +15,12 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
         }
         return false;
     });
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 1024;
+        }
+        return true;
+    });
 
     useEffect(() => {
         if (darkMode) {
@@ -24,115 +31,25 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
         localStorage.setItem('darkMode', darkMode);
     }, [darkMode]);
 
-    const handleLogout = () => {
-        router.post('/logout');
-    };
-
     return (
         <div className={darkMode ? 'dark' : ''}>
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-                {/* Sidebar */}
-                <aside className={`fixed top-0 left-0 z-40 h-screen transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700`}>
-                    <div className="h-full px-3 py-4 overflow-y-auto">
-                        {/* Logo */}
-                        <div className="flex items-center justify-center mb-8 p-4">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                </div>
-                                <span className="text-xl font-bold text-gray-800 dark:text-white">Admin Panel</span>
-                            </div>
-                        </div>
+            <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+                <Head title="Dashboard" />
 
-                        {/* Navigation */}
-                        <ul className="space-y-2 font-medium">
-                            <li>
-                                <a href="/admin/dashboard" className="flex items-center p-3 text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg group">
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                                    </svg>
-                                    <span className="ml-3">Dashboard</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/admin/mahasiswa" className="flex items-center p-3 text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
-                                    </svg>
-                                    <span className="ml-3">Mahasiswa</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/admin/dosen" className="flex items-center p-3 text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
-                                    </svg>
-                                    <span className="ml-3">Dosen</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/admin/fakultas" className="flex items-center p-3 text-gray-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path>
-                                    </svg>
-                                    <span className="ml-3">Fakultas & Prodi</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </aside>
+                <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeMenu="dashboard" />
 
-                {/* Main Content */}
-                <div className={`p-4 ${sidebarOpen ? 'ml-64' : 'ml-0'} transition-all duration-300`}>
-                    {/* Header */}
-                    <header className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4">
-                                <button
-                                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                                    className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600"
-                                >
-                                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"></path>
-                                    </svg>
-                                </button>
-                                <div>
-                                    <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Dashboard Admin</h1>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">Selamat datang, {user?.name || 'Admin'}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-4">
-                                <button
-                                    onClick={() => setDarkMode(!darkMode)}
-                                    className="p-3 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300"
-                                >
-                                    {darkMode ? (
-                                        <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                                        </svg>
-                                    )}
-                                </button>
-                                <button
-                                    onClick={handleLogout}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-300"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
-                                    <span>Logout</span>
-                                </button>
-                            </div>
-                        </div>
-                    </header>
+                <div className={`p-4 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'}`}>
+                    <Header
+                        sidebarOpen={sidebarOpen}
+                        setSidebarOpen={setSidebarOpen}
+                        darkMode={darkMode}
+                        setDarkMode={setDarkMode}
+                        title="Dashboard Admin"
+                        subtitle={`Selamat datang, ${user?.name || 'Admin'}`}
+                    />
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
                         {/* Total Mahasiswa */}
                         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
                             <div className="flex items-center justify-between">
