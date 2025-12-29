@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -49,6 +50,17 @@ class HandleInertiaRequests extends Middleware
             // Token invalid or expired
         }
 
+        $flash = [
+            'success' => $request->session()->get('success'),
+            'error' => $request->session()->get('error'),
+            'import_errors' => $request->session()->get('import_errors'),
+        ];
+        
+        // Debug log
+        if ($flash['success'] || $flash['error']) {
+            Log::info('Flash messages in middleware:', $flash);
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -59,11 +71,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $user->role ? $user->role->name : null,
                 ] : null,
             ],
-            'flash' => [
-                'success' => $request->session()->get('success'),
-                'error' => $request->session()->get('error'),
-                'import_errors' => $request->session()->get('import_errors'),
-            ],
+            'flash' => $flash,
         ];
     }
 }

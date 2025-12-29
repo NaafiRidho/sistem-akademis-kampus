@@ -5,12 +5,53 @@ import Header from "@/Components/Layout/Header";
 import MahasiswaFormModal from "@/Components/Modals/MahasiswaFormModal";
 import DeleteConfirmationModal from "@/Components/Modals/DeleteConfirmationModal";
 import ImportModal from "@/Components/Modals/ImportModal";
+import Toast from "@/Components/Toast";
 
-export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
-    const { flash } = usePage().props;
+interface Mahasiswa {
+    id: number;
+    nim: string;
+    nama: string;
+    prodi_id: number;
+    angkatan: number;
+    jenis_kelamin: string;
+    alamat?: string;
+    user?: { email: string };
+    prodi?: { nama_prodi: string };
+}
+
+interface Prodi {
+    id: number;
+    nama_prodi: string;
+    fakultas?: { nama_fakultas: string };
+}
+
+interface PageProps {
+    mahasiswa: {
+        data: Mahasiswa[];
+        links: any[];
+        from: number;
+        to: number;
+        total: number;
+    };
+    prodis: Prodi[];
+    filters: {
+        search?: string;
+        prodi_id?: string;
+    };
+}
+
+export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps) {
+    const page = usePage();
+    const props = page.props as any;
     
-    console.log('All page props:', usePage().props);
-    console.log('Flash from props:', flash);
+    const [showToast, setShowToast] = useState(false);
+    const [toastConfig, setToastConfig] = useState({ type: 'info', message: '', details: [] });
+    
+    console.log('=== FULL PAGE PROPS ===', props);
+    console.log('Props keys:', Object.keys(props));
+    console.log('Auth:', props.auth);
+    console.log('Flash:', props.flash);
+    console.log('Errors:', props.errors);
 
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== "undefined") {
@@ -33,7 +74,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedMahasiswa, setSelectedMahasiswa] = useState(null);
+    const [selectedMahasiswa, setSelectedMahasiswa] = useState<Mahasiswa | null>(null);
     const [formData, setFormData] = useState({
         nim: "",
         nama: "",
@@ -51,14 +92,41 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
         } else {
             document.documentElement.classList.remove("dark");
         }
-        localStorage.setItem("darkMode", darkMode);
+        localStorage.setItem("darkMode", String(darkMode));
     }, [darkMode]);
 
     useEffect(() => {
-        if (flash) {
-            console.log('Flash messages:', flash);
-        }
-    }, [flash]);
+        console.log('=== Flash Effect Triggered ===');
+        console.log('Props in effect:', props);
+        console.log('Flash in effect:', props?.flash);
+        
+        const flash = props?.flash;
+        
+        // Reset toast first
+        setShowToast(false);
+        
+        setTimeout(() => {
+            if (flash?.success) {
+                console.log('Setting SUCCESS toast with message:', flash.success);
+                setToastConfig({
+                    type: 'success',
+                    message: flash.success,
+                    details: flash.import_errors || []
+                });
+                setShowToast(true);
+                console.log('Toast state set to TRUE');
+            } else if (flash?.error) {
+                console.log('Setting ERROR toast with message:', flash.error);
+                setToastConfig({
+                    type: 'error',
+                    message: flash.error,
+                    details: flash.import_errors || []
+                });
+                setShowToast(true);
+                console.log('Toast state set to TRUE');
+            }
+        }, 100);
+    }, [props]);
 
     const resetFormData = () => ({
         nim: "",
@@ -71,7 +139,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
         password: "",
     });
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(
             "/admin/mahasiswa",
@@ -83,7 +151,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
         );
     };
 
-    const handleDelete = (mhs) => {
+    const handleDelete = (mhs: Mahasiswa) => {
         setSelectedMahasiswa(mhs);
         setShowDeleteModal(true);
     };
@@ -91,7 +159,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
     const confirmDelete = () => {
         if (selectedMahasiswa) {
             router.post(
-                `/admin/mahasiswa/${selectedMahasiswa.id}`,
+                `/admin/mahasiswa/${selectedMahasiswa?.id}`,
                 {
                     _method: "DELETE",
                 },
@@ -110,22 +178,22 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
         setShowCreateModal(true);
     };
 
-    const handleEdit = (mhs) => {
+    const handleEdit = (mhs: Mahasiswa) => {
         setSelectedMahasiswa(mhs);
         setFormData({
             nim: mhs.nim,
             nama: mhs.nama,
-            prodi_id: mhs.prodi_id,
-            angkatan: mhs.angkatan,
+            prodi_id: String(mhs.prodi_id),
+            angkatan: String(mhs.angkatan),
             jenis_kelamin: mhs.jenis_kelamin,
-            alamat: mhs.alamat,
-            email: mhs.user?.email || mhs.email || "",
+            alamat: mhs.alamat || "",
+            email: mhs.user?.email || "",
             password: "",
         });
         setShowEditModal(true);
     };
 
-    const handleSubmitCreate = (e) => {
+    const handleSubmitCreate = (e: React.FormEvent) => {
         e.preventDefault();
         router.post("/admin/mahasiswa", formData, {
             onSuccess: () => {
@@ -135,10 +203,10 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
         });
     };
 
-    const handleSubmitEdit = (e) => {
+    const handleSubmitEdit = (e: React.FormEvent) => {
         e.preventDefault();
         router.post(
-            `/admin/mahasiswa/${selectedMahasiswa.id}`,
+            `/admin/mahasiswa/${selectedMahasiswa?.id}`,
             {
                 ...formData,
                 _method: "PUT",
@@ -152,7 +220,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
         );
     };
 
-    const handleImport = (e) => {
+    const handleImport = (e: React.FormEvent) => {
         e.preventDefault();
         
         if (!importFile) {
@@ -174,6 +242,9 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
             },
         });
     };
+
+    // Debug toast rendering
+    console.log('Rendering toast check - showToast:', showToast, 'toastConfig:', toastConfig);
 
     return (
         <div className={darkMode ? "dark" : ""}>
@@ -235,41 +306,8 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
                             </button>
                         </div>
 
-                        {/* Flash Messages */}
-                        {flash?.success && (
-                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900 border-l-4 border-green-500 dark:border-green-400 text-green-700 dark:text-green-200 px-6 py-4 rounded-xl shadow-lg flex items-center animate-fade-in">
-                                <svg className="w-6 h-6 mr-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="font-medium">{flash.success}</span>
-                            </div>
-                        )}
-                        {flash?.error && (
-                            <div className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900 dark:to-pink-900 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-200 px-6 py-4 rounded-xl shadow-lg flex items-center animate-fade-in">
-                                <svg className="w-6 h-6 mr-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                </svg>
-                                <span className="font-medium">{flash.error}</span>
-                            </div>
-                        )}
-                        {flash?.import_errors && flash.import_errors.length > 0 && (
-                            <div className="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-500 dark:border-yellow-400 text-yellow-700 dark:text-yellow-200 px-6 py-4 rounded-xl shadow-lg">
-                                <div className="flex items-center mb-2">
-                                    <svg className="w-6 h-6 mr-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                    </svg>
-                                    <span className="font-medium">Error Import ({flash.import_errors.length} baris):</span>
-                                </div>
-                                <ul className="list-disc list-inside space-y-1 ml-9 text-sm max-h-40 overflow-y-auto">
-                                    {flash.import_errors.slice(0, 10).map((error, index) => (
-                                        <li key={index}>{error}</li>
-                                    ))}
-                                    {flash.import_errors.length > 10 && (
-                                        <li className="font-semibold">... dan {flash.import_errors.length - 10} error lainnya</li>
-                                    )}
-                                </ul>
-                            </div>
-                        )}
+                        {/* Flash Messages - Now handled by Toast */}
+                        {/* Keeping this for backward compatibility but Toast is preferred */}
 
                         {/* Search and Filter */}
                         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
@@ -303,7 +341,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
                                         className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     >
                                         <option value="">Semua Prodi</option>
-                                        {prodis.map((prodi) => (
+                                        {prodis.map((prodi: Prodi) => (
                                             <option
                                                 key={prodi.id}
                                                 value={prodi.id}
@@ -358,14 +396,14 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
                                     {mahasiswa.data.length === 0 ? (
                                         <tr>
                                             <td
-                                                colSpan="6"
+                                                colSpan={6}
                                                 className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
                                             >
                                                 Tidak ada data mahasiswa
                                             </td>
                                         </tr>
                                     ) : (
-                                        mahasiswa.data.map((mhs) => (
+                                        mahasiswa.data.map((mhs: Mahasiswa) => (
                                             <tr
                                                 key={mhs.id}
                                                 className="hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -427,7 +465,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
                                         </div>
                                         <div className="flex gap-2">
                                             {mahasiswa.links.map(
-                                                (link, index) => {
+                                                (link: any, index: number) => {
                                                     const Component = link.url
                                                         ? "a"
                                                         : "span";
@@ -511,6 +549,20 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }) {
                         : ""
                 }
             />
+            
+            {/* Toast Notification */}
+            {showToast && (
+                <Toast
+                    type={toastConfig.type as 'success' | 'error' | 'warning' | 'info'}
+                    message={toastConfig.message}
+                    details={toastConfig.details}
+                    onClose={() => {
+                        console.log('Toast onClose called');
+                        setShowToast(false);
+                    }}
+                    duration={toastConfig.details?.length > 0 ? 8000 : 5000}
+                />
+            )}
         </div>
     );
 }

@@ -5,9 +5,13 @@ import Header from '@/Components/Layout/Header';
 import DosenFormModal from '@/Components/Modals/DosenFormModal';
 import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal';
 import ImportModal from '@/Components/Modals/ImportModal';
+import Toast from '@/Components/Toast';
 
 export default function DosenIndex({ dosen, filters }) {
     const { flash } = usePage().props;
+    
+    const [showToast, setShowToast] = useState(false);
+    const [toastConfig, setToastConfig] = useState({ type: 'info', message: '', details: [] });
     
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -45,6 +49,34 @@ export default function DosenIndex({ dosen, filters }) {
         }
         localStorage.setItem('darkMode', darkMode);
     }, [darkMode]);
+    
+    useEffect(() => {
+        console.log('=== Dosen Flash Effect ===');
+        console.log('Flash:', flash);
+        
+        // Reset toast first
+        setShowToast(false);
+        
+        setTimeout(() => {
+            if (flash?.success) {
+                console.log('Setting SUCCESS toast:', flash.success);
+                setToastConfig({
+                    type: 'success',
+                    message: flash.success,
+                    details: flash.import_errors || []
+                });
+                setShowToast(true);
+            } else if (flash?.error) {
+                console.log('Setting ERROR toast:', flash.error);
+                setToastConfig({
+                    type: 'error',
+                    message: flash.error,
+                    details: flash.import_errors || []
+                });
+                setShowToast(true);
+            }
+        }, 100);
+    }, [flash]);
 
     const resetFormData = () => ({
         nidn: '',
@@ -376,6 +408,17 @@ export default function DosenIndex({ dosen, filters }) {
                 message={`Apakah Anda yakin ingin menghapus data dosen`}
                 itemName={selectedDosen ? `${selectedDosen.nama} (${selectedDosen.nidn})` : ''}
             />
+            
+            {/* Toast Notification */}
+            {showToast && (
+                <Toast
+                    type={toastConfig.type}
+                    message={toastConfig.message}
+                    details={toastConfig.details}
+                    onClose={() => setShowToast(false)}
+                    duration={toastConfig.details?.length > 0 ? 8000 : 5000}
+                />
+            )}
         </div>
     );
 }

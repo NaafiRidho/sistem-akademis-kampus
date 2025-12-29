@@ -290,7 +290,8 @@ class MahasiswaController extends Controller
             Log::info("Import completed. Imported: {$imported}, Errors: " . count($errors));
 
             if ($imported === 0 && !empty($errors)) {
-                return back()->with('error', 'Gagal mengimport data. ' . implode(', ', array_slice($errors, 0, 3)));
+                return redirect()->route('admin.mahasiswa.index')
+                    ->with('error', 'Gagal mengimport data. ' . implode(', ', array_slice($errors, 0, 3)));
             }
 
             $message = "Berhasil mengimport {$imported} data mahasiswa";
@@ -298,13 +299,18 @@ class MahasiswaController extends Controller
                 $message .= ". Terdapat " . count($errors) . " error";
             }
 
+            Log::info('Redirecting with flash message: ' . $message);
+
             return redirect()->route('admin.mahasiswa.index')
-                ->with('success', $message)
-                ->with('import_errors', $errors);
+                ->with([
+                    'success' => $message,
+                    'import_errors' => $errors
+                ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal mengimport data: ' . $e->getMessage());
+            return redirect()->route('admin.mahasiswa.index')
+                ->with('error', 'Gagal mengimport data: ' . $e->getMessage());
         }
     }
 
