@@ -1,63 +1,58 @@
-import { useState, useEffect } from "react";
-import { Head, router, usePage } from "@inertiajs/react";
-import Sidebar from "@/Components/Layout/Sidebar";
-import Header from "@/Components/Layout/Header";
-import MahasiswaFormModal from "@/Components/Modals/MahasiswaFormModal";
-import DeleteConfirmationModal from "@/Components/Modals/DeleteConfirmationModal";
-import ImportModal from "@/Components/Modals/ImportModal";
-import Toast from "@/Components/Toast";
-
-interface Mahasiswa {
-    id: number;
-    nim: string;
-    nama: string;
-    prodi_id: number;
-    angkatan: number;
-    jenis_kelamin: string;
-    alamat?: string;
-    user?: { email: string };
-    prodi?: { nama_prodi: string };
-}
+import { useState, useEffect } from 'react';
+import { Head, router, usePage } from '@inertiajs/react';
+import Sidebar from '@/Components/Layout/Sidebar';
+import Header from '@/Components/Layout/Header';
+import ProdiFormModal from '@/Components/Modals/ProdiFormModal';
+import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal';
+import ImportModal from '@/Components/Modals/ImportModal';
+import Toast from '@/Components/Toast';
 
 interface Prodi {
     id: number;
     nama_prodi: string;
-    fakultas?: { nama_fakultas: string };
+    fakultas_id: number;
+    fakultas?: {
+        nama_fakultas: string;
+    };
+    mahasiswa_count?: number;
+}
+
+interface Fakultas {
+    id: number;
+    nama_fakultas: string;
 }
 
 interface PageProps {
-    mahasiswa: {
-        data: Mahasiswa[];
+    prodi: {
+        data: Prodi[];
         links: any[];
         from: number;
         to: number;
         total: number;
     };
-    prodis: Prodi[];
+    fakultas: Fakultas[];
     filters: {
         search?: string;
-        prodi_id?: string;
+        fakultas_id?: string;
     };
 }
 
-export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps) {
+export default function ProdiIndex({ prodi, fakultas, filters }: PageProps) {
     const page = usePage();
     const props = page.props as any;
     
     const [showToast, setShowToast] = useState(false);
-    const [toastConfig, setToastConfig] = useState({ type: 'info', message: '', details: [] });
+    const [toastConfig, setToastConfig] = useState<{ type: string; message: string; details: string[] }>({ 
+        type: 'info', 
+        message: '', 
+        details: [] 
+    });
     
-    console.log('=== FULL PAGE PROPS ===', props);
-    console.log('Props keys:', Object.keys(props));
-    console.log('Auth:', props.auth);
-    console.log('Flash:', props.flash);
-    console.log('Errors:', props.errors);
-
     const [darkMode, setDarkMode] = useState(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("darkMode");
-            if (saved !== null) return saved === "true";
-            return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('darkMode');
+            if (saved !== null) return saved === 'true';
+            return window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
         return false;
     });
@@ -67,36 +62,30 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
         }
         return true;
     });
-    const [search, setSearch] = useState(filters.search || "");
-    const [prodiFilter, setProdiFilter] = useState(filters.prodi_id || "");
+    const [search, setSearch] = useState(filters.search || '');
+    const [fakultasFilter, setFakultasFilter] = useState(filters.fakultas_id || '');
     const [showImportModal, setShowImportModal] = useState(false);
     const [importFile, setImportFile] = useState<File | null>(null);
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedMahasiswa, setSelectedMahasiswa] = useState<Mahasiswa | null>(null);
+    const [selectedProdi, setSelectedProdi] = useState<Prodi | null>(null);
     const [formData, setFormData] = useState({
-        nim: "",
-        nama: "",
-        prodi_id: "",
-        angkatan: "",
-        jenis_kelamin: "L",
-        alamat: "",
-        email: "",
-        password: "",
+        nama_prodi: '',
+        fakultas_id: ''
     });
 
     useEffect(() => {
         if (darkMode) {
-            document.documentElement.classList.add("dark");
+            document.documentElement.classList.add('dark');
         } else {
-            document.documentElement.classList.remove("dark");
+            document.documentElement.classList.remove('dark');
         }
-        localStorage.setItem("darkMode", String(darkMode));
+        localStorage.setItem('darkMode', String(darkMode));
     }, [darkMode]);
-
+    
     useEffect(() => {
-        console.log('=== Flash Effect Triggered ===');
+        console.log('=== Prodi Flash Effect Triggered ===');
         console.log('Props in effect:', props);
         console.log('Flash in effect:', props?.flash);
         
@@ -129,95 +118,73 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
     }, [props]);
 
     const resetFormData = () => ({
-        nim: "",
-        nama: "",
-        prodi_id: "",
-        angkatan: "",
-        jenis_kelamin: "L",
-        alamat: "",
-        email: "",
-        password: "",
+        nama_prodi: '',
+        fakultas_id: ''
     });
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(
-            "/admin/mahasiswa",
-            { search, prodi_id: prodiFilter },
-            {
-                preserveState: true,
-                replace: true,
-            }
-        );
+        router.get('/admin/prodi', { search, fakultas_id: fakultasFilter }, {
+            preserveState: true,
+            replace: true,
+        });
     };
 
-    const handleDelete = (mhs: Mahasiswa) => {
-        setSelectedMahasiswa(mhs);
+    const handleDelete = (prod: Prodi) => {
+        setSelectedProdi(prod);
         setShowDeleteModal(true);
     };
 
     const confirmDelete = () => {
-        if (selectedMahasiswa) {
-            router.post(
-                `/admin/mahasiswa/${selectedMahasiswa?.id}`,
-                {
-                    _method: "DELETE",
-                },
-                {
-                    onSuccess: () => {
-                        setShowDeleteModal(false);
-                        setSelectedMahasiswa(null);
-                    },
+        if (selectedProdi) {
+            router.post(`/admin/prodi/${selectedProdi?.id}`, {
+                _method: 'DELETE'
+            }, {
+                onSuccess: () => {
+                    setShowDeleteModal(false);
+                    setSelectedProdi(null);
                 }
-            );
+            });
         }
     };
 
     const handleCreate = () => {
         setFormData(resetFormData());
-        setShowCreateModal(true);
+        setModalMode('create');
+        setShowModal(true);
     };
 
-    const handleEdit = (mhs: Mahasiswa) => {
-        setSelectedMahasiswa(mhs);
+    const handleEdit = (prod: Prodi) => {
+        setSelectedProdi(prod);
         setFormData({
-            nim: mhs.nim,
-            nama: mhs.nama,
-            prodi_id: String(mhs.prodi_id),
-            angkatan: String(mhs.angkatan),
-            jenis_kelamin: mhs.jenis_kelamin,
-            alamat: mhs.alamat || "",
-            email: mhs.user?.email || "",
-            password: "",
+            nama_prodi: prod.nama_prodi,
+            fakultas_id: String(prod.fakultas_id)
         });
-        setShowEditModal(true);
+        setModalMode('edit');
+        setShowModal(true);
     };
 
     const handleSubmitCreate = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post("/admin/mahasiswa", formData, {
+        router.post('/admin/prodi', formData, {
             onSuccess: () => {
-                setShowCreateModal(false);
+                setShowModal(false);
                 setFormData(resetFormData());
-            },
+            }
         });
     };
 
     const handleSubmitEdit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post(
-            `/admin/mahasiswa/${selectedMahasiswa?.id}`,
-            {
-                ...formData,
-                _method: "PUT",
-            },
-            {
-                onSuccess: () => {
-                    setShowEditModal(false);
-                    setSelectedMahasiswa(null);
-                },
+        router.post(`/admin/prodi/${selectedProdi?.id}`, {
+            ...formData,
+            _method: 'PUT'
+        }, {
+            onSuccess: () => {
+                setShowModal(false);
+                setSelectedProdi(null);
             }
-        );
+        });
     };
 
     const handleImport = (e: React.FormEvent) => {
@@ -229,9 +196,12 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
         }
         
         const formData = new FormData();
-        formData.append("file", importFile);
+        formData.append('file', importFile, importFile.name);
 
-        router.post("/admin/mahasiswa/import", formData, {
+        router.post('/admin/prodi/import', formData, {
+            forceFormData: true,
+            preserveState: false,
+            preserveScroll: false,
             onSuccess: (page) => {
                 console.log('Import success:', page.props.flash);
                 setShowImportModal(false);
@@ -243,15 +213,12 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
         });
     };
 
-    // Debug toast rendering
-    console.log('Rendering toast check - showToast:', showToast, 'toastConfig:', toastConfig);
-
     return (
-        <div className={darkMode ? "dark" : ""}>
+        <div className={darkMode ? 'dark' : ''}>
             <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-                <Head title="Data Mahasiswa" />
+                <Head title="Data Program Studi" />
 
-                <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeMenu="mahasiswa" />
+                <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeMenu="prodi" />
 
                 <div className={`p-4 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'}`}>
                     <Header
@@ -259,8 +226,8 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                         setSidebarOpen={setSidebarOpen}
                         darkMode={darkMode}
                         setDarkMode={setDarkMode}
-                        title="Data Mahasiswa"
-                        subtitle="Kelola data mahasiswa"
+                        title="Data Program Studi"
+                        subtitle="Kelola data program studi"
                     />
 
                     <div className="space-y-6">
@@ -270,18 +237,8 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                                 onClick={() => setShowImportModal(true)}
                                 className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200"
                             >
-                                <svg
-                                    className="w-5 h-5 mr-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                    />
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                 </svg>
                                 Import Excel
                             </button>
@@ -289,20 +246,10 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                                 onClick={handleCreate}
                                 className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200"
                             >
-                                <svg
-                                    className="w-5 h-5 mr-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                                    />
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
-                                Tambah Mahasiswa
+                                Tambah Program Studi
                             </button>
                         </div>
 
@@ -317,37 +264,26 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                                 </svg>
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pencarian & Filter</h3>
                             </div>
-                            <form
-                                onSubmit={handleSearch}
-                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"
-                            >
+                            <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                                 <div>
                                     <input
                                         type="text"
-                                        placeholder="Cari NIM atau Nama..."
+                                        placeholder="Cari Nama Prodi..."
                                         value={search}
-                                        onChange={(e) =>
-                                            setSearch(e.target.value)
-                                        }
+                                        onChange={(e) => setSearch(e.target.value)}
                                         className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     />
                                 </div>
                                 <div>
                                     <select
-                                        value={prodiFilter}
-                                        onChange={(e) =>
-                                            setProdiFilter(e.target.value)
-                                        }
+                                        value={fakultasFilter}
+                                        onChange={(e) => setFakultasFilter(e.target.value)}
                                         className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     >
-                                        <option value="">Semua Prodi</option>
-                                        {prodis.map((prodi: Prodi) => (
-                                            <option
-                                                key={prodi.id}
-                                                value={prodi.id}
-                                            >
-                                                {prodi.nama_prodi} -{" "}
-                                                {prodi.fakultas?.nama_fakultas}
+                                        <option value="">Semua Fakultas</option>
+                                        {fakultas.map((fak: Fakultas) => (
+                                            <option key={fak.id} value={fak.id}>
+                                                {fak.nama_fakultas}
                                             </option>
                                         ))}
                                     </select>
@@ -373,19 +309,16 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            NIM
+                                            No
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Nama
+                                            Nama Program Studi
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Prodi
+                                            Fakultas
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Angkatan
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Jenis Kelamin
+                                            Jumlah Mahasiswa
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Aksi
@@ -393,57 +326,48 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    {mahasiswa.data.length === 0 ? (
+                                    {prodi.data.length === 0 ? (
                                         <tr>
-                                            <td
-                                                colSpan={6}
-                                                className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
-                                            >
-                                                Tidak ada data mahasiswa
+                                            <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                                Tidak ada data program studi
                                             </td>
                                         </tr>
                                     ) : (
-                                        mahasiswa.data.map((mhs: Mahasiswa) => (
-                                            <tr
-                                                key={mhs.id}
-                                                className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                                            >
+                                        prodi.data.map((prod: Prodi, index: number) => (
+                                            <tr key={prod.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                                    {mhs.nim}
+                                                    {prodi.from + index}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
+                                                    {prod.nama_prodi}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                    {mhs.nama}
+                                                    {prod.fakultas?.nama_fakultas}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                    {mhs.prodi?.nama_prodi}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                    {mhs.angkatan}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                    {mhs.jenis_kelamin === "L"
-                                                        ? "Laki-laki"
-                                                        : "Perempuan"}
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                        {prod.mahasiswa_count || 0} Mahasiswa
+                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex items-center gap-2">
                                                         <button
-                                                            onClick={() => handleEdit(mhs)}
-                                                            className="inline-flex items-center justify-center p-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 transform hover:scale-110 transition-all duration-200 shadow-md hover:shadow-lg"
-                                                            title="Edit"
+                                                            onClick={() => handleEdit(prod)}
+                                                            className="inline-flex items-center px-3 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 transform hover:scale-105 transition-all duration-200"
                                                         >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                             </svg>
+                                                            Edit
                                                         </button>
                                                         <button
-                                                            onClick={() => handleDelete(mhs)}
-                                                            className="inline-flex items-center justify-center p-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-600 text-white hover:from-red-600 hover:to-pink-700 transform hover:scale-110 transition-all duration-200 shadow-md hover:shadow-lg"
-                                                            title="Hapus"
+                                                            onClick={() => handleDelete(prod)}
+                                                            className="inline-flex items-center px-3 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 transform hover:scale-105 transition-all duration-200"
                                                         >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                             </svg>
+                                                            Hapus
                                                         </button>
                                                     </div>
                                                 </td>
@@ -455,42 +379,36 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                             </div>
 
                             {/* Pagination */}
-                            {mahasiswa.links.length > 3 && (
+                            {prodi.links.length > 3 && (
                                 <div className="bg-white dark:bg-gray-800 px-4 py-3 border-t border-gray-200 dark:border-gray-700 sm:px-6">
                                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                                         <div className="text-sm text-gray-700 dark:text-gray-300">
-                                            Menampilkan {mahasiswa.from} -{" "}
-                                            {mahasiswa.to} dari{" "}
-                                            {mahasiswa.total} data
+                                            Menampilkan {prodi.from} - {prodi.to} dari {prodi.total} data
                                         </div>
                                         <div className="flex gap-2">
-                                            {mahasiswa.links.map(
-                                                (link: any, index: number) => {
-                                                    const Component = link.url
-                                                        ? "a"
-                                                        : "span";
-                                                    return (
-                                                        <Component
-                                                            key={index}
-                                                            href={
-                                                                link.url ||
-                                                                undefined
+                                            {prodi.links.map((link: any, index: number) => {
+                                                const Component = link.url ? 'a' : 'span';
+                                                return (
+                                                    <Component
+                                                        key={index}
+                                                        href={link.url || '#'}
+                                                        onClick={(e: any) => {
+                                                            if (link.url) {
+                                                                e.preventDefault();
+                                                                router.get(link.url);
                                                             }
-                                                            className={`px-3 py-1 rounded ${
-                                                                link.active
-                                                                    ? "bg-blue-600 text-white"
-                                                                    : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border dark:border-gray-600"
-                                                            } ${
-                                                                !link.url &&
-                                                                "cursor-not-allowed opacity-50"
-                                                            }`}
-                                                            dangerouslySetInnerHTML={{
-                                                                __html: link.label,
-                                                            }}
-                                                        />
-                                                    );
-                                                }
-                                            )}
+                                                        }}
+                                                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                                                            link.active
+                                                                ? 'bg-blue-600 text-white'
+                                                                : link.url
+                                                                ? 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600'
+                                                                : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                                                        }`}
+                                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                                    />
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </div>
@@ -510,44 +428,35 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                 onSubmit={handleImport}
                 file={importFile}
                 setFile={setImportFile}
-                templateUrl="/admin/mahasiswa/template/download"
-                entityName="Mahasiswa"
+                templateUrl="/admin/prodi/template/download"
+                entityName="Program Studi"
             />
 
-            <MahasiswaFormModal
-                show={showCreateModal}
-                onClose={() => setShowCreateModal(false)}
-                onSubmit={handleSubmitCreate}
-                formData={formData}
-                setFormData={setFormData}
-                prodis={prodis}
-                isEdit={false}
-            />
-
-            <MahasiswaFormModal
-                show={showEditModal}
-                onClose={() => setShowEditModal(false)}
-                onSubmit={handleSubmitEdit}
-                formData={formData}
-                setFormData={setFormData}
-                prodis={prodis}
-                isEdit={true}
-            />
+            {showModal && (
+                <ProdiFormModal
+                    show={showModal}
+                    onClose={() => {
+                        setShowModal(false);
+                        setFormData(resetFormData());
+                    }}
+                    onSubmit={modalMode === 'create' ? handleSubmitCreate : handleSubmitEdit}
+                    formData={formData}
+                    setFormData={setFormData}
+                    fakultas={fakultas}
+                    isEdit={modalMode === 'edit'}
+                />
+            )}
 
             <DeleteConfirmationModal
                 show={showDeleteModal}
                 onClose={() => {
                     setShowDeleteModal(false);
-                    setSelectedMahasiswa(null);
+                    setSelectedProdi(null);
                 }}
                 onConfirm={confirmDelete}
-                title="Hapus Data Mahasiswa"
-                message={`Apakah Anda yakin ingin menghapus data mahasiswa`}
-                itemName={
-                    selectedMahasiswa
-                        ? `${selectedMahasiswa.nama} (${selectedMahasiswa.nim})`
-                        : ""
-                }
+                title="Hapus Data Program Studi"
+                message={`Apakah Anda yakin ingin menghapus data program studi`}
+                itemName={selectedProdi ? `${selectedProdi.nama_prodi} - ${selectedProdi.fakultas?.nama_fakultas}` : ''}
             />
             
             {/* Toast Notification */}

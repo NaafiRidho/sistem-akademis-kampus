@@ -39,4 +39,14 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::resource('dosen', \App\Http\Controllers\Admin\DosenController::class);
     Route::post('dosen/import', [\App\Http\Controllers\Admin\DosenController::class, 'import'])->name('dosen.import');
     Route::get('dosen/template/download', [\App\Http\Controllers\Admin\DosenController::class, 'downloadTemplate'])->name('dosen.template');
+    
+    // Fakultas CRUD
+    Route::resource('fakultas', \App\Http\Controllers\Admin\FakultasController::class);
+    Route::post('fakultas/import', [\App\Http\Controllers\Admin\FakultasController::class, 'import'])->name('fakultas.import');
+    Route::get('fakultas/template/download', [\App\Http\Controllers\Admin\FakultasController::class, 'downloadTemplate'])->name('fakultas.template');
+    
+    // Prodi CRUD
+    Route::resource('prodi', \App\Http\Controllers\Admin\ProdiController::class);
+    Route::post('prodi/import', [\App\Http\Controllers\Admin\ProdiController::class, 'import'])->name('prodi.import');
+    Route::get('prodi/template/download', [\App\Http\Controllers\Admin\ProdiController::class, 'downloadTemplate'])->name('prodi.template');
 });

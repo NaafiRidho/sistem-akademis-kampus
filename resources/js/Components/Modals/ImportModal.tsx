@@ -1,4 +1,16 @@
-export default function ImportModal({ show, onClose, onSubmit, file, setFile, templateUrl, entityName }) {
+import { createPortal } from 'react-dom';
+
+interface ImportModalProps {
+    show: boolean;
+    onClose: () => void;
+    onSubmit: (e: React.FormEvent) => void;
+    file: File | null;
+    setFile: (file: File | null) => void;
+    templateUrl: string;
+    entityName: string;
+}
+
+export default function ImportModal({ show, onClose, onSubmit, file, setFile, templateUrl, entityName }: ImportModalProps) {
     if (!show) return null;
 
     const handleSubmit = (e) => {
@@ -10,7 +22,7 @@ export default function ImportModal({ show, onClose, onSubmit, file, setFile, te
         onSubmit(e);
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start justify-center p-4">
             <div className="relative top-10 md:top-20 mx-auto p-4 md:p-5 border w-full max-w-md shadow-lg rounded-md bg-white dark:bg-gray-800">
                 <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
@@ -62,6 +74,7 @@ export default function ImportModal({ show, onClose, onSubmit, file, setFile, te
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

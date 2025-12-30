@@ -3,8 +3,47 @@ import { usePage, router, Head } from '@inertiajs/react';
 import Sidebar from '@/Components/Layout/Sidebar';
 import Header from '@/Components/Layout/Header';
 
-export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
-    const { auth } = usePage().props;
+interface Stats {
+    total_mahasiswa?: number;
+    total_dosen?: number;
+    total_fakultas?: number;
+    total_prodi?: number;
+}
+
+interface AbsensiStats {
+    hadir?: number;
+    sakit?: number;
+    izin?: number;
+    alpha?: number;
+}
+
+interface GrafikNilai {
+    A?: number;
+    B?: number;
+    C?: number;
+    D?: number;
+    E?: number;
+}
+
+interface DashboardProps {
+    stats: Stats;
+    absensi_stats: AbsensiStats;
+    grafik_nilai: GrafikNilai;
+}
+
+interface AuthUser {
+    name?: string;
+}
+
+interface PageProps {
+    auth?: {
+        user?: AuthUser;
+    };
+    [key: string]: any;
+}
+
+export default function Dashboard({ stats, absensi_stats, grafik_nilai }: DashboardProps) {
+    const { auth } = usePage<PageProps>().props;
     const user = auth?.user;
 
     const [darkMode, setDarkMode] = useState(() => {
@@ -28,7 +67,7 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
         } else {
             document.documentElement.classList.remove('dark');
         }
-        localStorage.setItem('darkMode', darkMode);
+        localStorage.setItem('darkMode', String(darkMode));
     }, [darkMode]);
 
     return (
@@ -51,11 +90,15 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
                         {/* Total Mahasiswa */}
-                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+                        <div 
+                            onClick={() => router.get('/admin/mahasiswa')}
+                            className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
+                        >
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-blue-100 text-sm mb-1">Total Mahasiswa</p>
                                     <p className="text-3xl font-bold">{stats?.total_mahasiswa || 0}</p>
+                                    <p className="text-blue-100 text-xs mt-2">Klik untuk kelola →</p>
                                 </div>
                                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -66,11 +109,15 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                         </div>
 
                         {/* Total Dosen (Guru) */}
-                        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+                        <div 
+                            onClick={() => router.get('/admin/dosen')}
+                            className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
+                        >
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-purple-100 text-sm mb-1">Total Guru/Dosen</p>
                                     <p className="text-3xl font-bold">{stats?.total_dosen || 0}</p>
+                                    <p className="text-purple-100 text-xs mt-2">Klik untuk kelola →</p>
                                 </div>
                                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -81,11 +128,15 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                         </div>
 
                         {/* Total Fakultas */}
-                        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+                        <div 
+                            onClick={() => router.get('/admin/fakultas')}
+                            className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
+                        >
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-green-100 text-sm mb-1">Fakultas</p>
                                     <p className="text-3xl font-bold">{stats?.total_fakultas || 0}</p>
+                                    <p className="text-green-100 text-xs mt-2">Klik untuk kelola →</p>
                                 </div>
                                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -96,11 +147,15 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                         </div>
 
                         {/* Total Prodi */}
-                        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300">
+                        <div 
+                            onClick={() => router.get('/admin/prodi')}
+                            className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
+                        >
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-orange-100 text-sm mb-1">Program Studi</p>
                                     <p className="text-3xl font-bold">{stats?.total_prodi || 0}</p>
+                                    <p className="text-orange-100 text-xs mt-2">Klik untuk kelola →</p>
                                 </div>
                                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -195,7 +250,7 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                                         <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.A || 0}</span>
                                     </div>
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                                        <div className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.A || 0) / Object.values(grafik_nilai || {}).reduce((a, b) => a + b, 0) * 100) || 0}%` }}></div>
+                                        <div className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.A || 0) / (Object.values(grafik_nilai || {}).reduce((a: number, b: number) => a + b, 0) || 1) * 100)}%` }}></div>
                                     </div>
                                 </div>
 
@@ -206,7 +261,7 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                                         <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.B || 0}</span>
                                     </div>
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.B || 0) / Object.values(grafik_nilai || {}).reduce((a, b) => a + b, 0) * 100) || 0}%` }}></div>
+                                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.B || 0) / (Object.values(grafik_nilai || {}).reduce((a: number, b: number) => a + b, 0) || 1) * 100)}%` }}></div>
                                     </div>
                                 </div>
 
@@ -217,7 +272,7 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                                         <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.C || 0}</span>
                                     </div>
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                                        <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.C || 0) / Object.values(grafik_nilai || {}).reduce((a, b) => a + b, 0) * 100) || 0}%` }}></div>
+                                        <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.C || 0) / (Object.values(grafik_nilai || {}).reduce((a: number, b: number) => a + b, 0) || 1) * 100)}%` }}></div>
                                     </div>
                                 </div>
 
@@ -228,7 +283,7 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                                         <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.D || 0}</span>
                                     </div>
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                                        <div className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.D || 0) / Object.values(grafik_nilai || {}).reduce((a, b) => a + b, 0) * 100) || 0}%` }}></div>
+                                        <div className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.D || 0) / (Object.values(grafik_nilai || {}).reduce((a: number, b: number) => a + b, 0) || 1) * 100)}%` }}></div>
                                     </div>
                                 </div>
 
@@ -239,7 +294,7 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }) {
                                         <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.E || 0}</span>
                                     </div>
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                                        <div className="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.E || 0) / Object.values(grafik_nilai || {}).reduce((a, b) => a + b, 0) * 100) || 0}%` }}></div>
+                                        <div className="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full" style={{ width: `${((grafik_nilai?.E || 0) / (Object.values(grafik_nilai || {}).reduce((a: number, b: number) => a + b, 0) || 1) * 100)}%` }}></div>
                                     </div>
                                 </div>
                             </div>

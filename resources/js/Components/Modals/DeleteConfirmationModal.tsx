@@ -1,7 +1,18 @@
-export default function DeleteConfirmationModal({ show, onClose, onConfirm, title, message, itemName }) {
+import { createPortal } from 'react-dom';
+
+interface DeleteConfirmationModalProps {
+    show: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    message: string;
+    itemName: string;
+}
+
+export default function DeleteConfirmationModal({ show, onClose, onConfirm, title, message, itemName }: DeleteConfirmationModalProps) {
     if (!show) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start justify-center p-4">
             <div className="relative top-10 md:top-20 mx-auto p-4 md:p-5 border w-full max-w-md shadow-lg rounded-md bg-white dark:bg-gray-800">
                 <div className="mt-3 text-center">
@@ -38,6 +49,7 @@ export default function DeleteConfirmationModal({ show, onClose, onConfirm, titl
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
