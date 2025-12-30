@@ -24,7 +24,13 @@ export default function ImportModal({ show, onClose, onSubmit, file, setFile, te
                         <input
                             type="file"
                             accept=".xlsx,.xls,.csv"
-                            onChange={(e) => setFile(e.target.files[0])}
+                            onChange={(e) => {
+                                const selectedFile = e.target.files?.[0];
+                                if (selectedFile) {
+                                    console.log('File selected:', selectedFile.name, selectedFile.type, selectedFile.size);
+                                    setFile(selectedFile);
+                                }
+                            }}
                             className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                         />
                         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">

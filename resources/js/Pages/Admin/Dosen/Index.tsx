@@ -7,11 +7,40 @@ import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal
 import ImportModal from '@/Components/Modals/ImportModal';
 import Toast from '@/Components/Toast';
 
-export default function DosenIndex({ dosen, filters }) {
-    const { flash } = usePage().props;
+interface Dosen {
+    id: number;
+    nidn: string;
+    nama: string;
+    email: string;
+    no_telepon?: string;
+    pendidikan_terakhir?: string;
+    user?: { email: string };
+}
+
+interface PageProps {
+    dosen: {
+        data: Dosen[];
+        links: any[];
+        from: number;
+        to: number;
+        total: number;
+    };
+    filters: {
+        search?: string;
+    };
+}
+
+export default function DosenIndex({ dosen, filters }: PageProps) {
+    const page = usePage();
+    const props = page.props as any;
+    const flash = props.flash as { success?: string; error?: string; import_errors?: string[] };
     
     const [showToast, setShowToast] = useState(false);
-    const [toastConfig, setToastConfig] = useState({ type: 'info', message: '', details: [] });
+    const [toastConfig, setToastConfig] = useState<{ type: string; message: string; details: string[] }>({ 
+        type: 'info', 
+        message: '', 
+        details: [] 
+    });
     
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -29,11 +58,11 @@ export default function DosenIndex({ dosen, filters }) {
     });
     const [search, setSearch] = useState(filters.search || '');
     const [showImportModal, setShowImportModal] = useState(false);
-    const [importFile, setImportFile] = useState(null);
+    const [importFile, setImportFile] = useState<File | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedDosen, setSelectedDosen] = useState(null);
+    const [selectedDosen, setSelectedDosen] = useState<Dosen | null>(null);
     const [formData, setFormData] = useState({
         nidn: '',
         nama: '',
@@ -47,36 +76,41 @@ export default function DosenIndex({ dosen, filters }) {
         } else {
             document.documentElement.classList.remove('dark');
         }
-        localStorage.setItem('darkMode', darkMode);
+        localStorage.setItem('darkMode', String(darkMode));
     }, [darkMode]);
     
     useEffect(() => {
-        console.log('=== Dosen Flash Effect ===');
-        console.log('Flash:', flash);
+        console.log('=== Dosen Flash Effect Triggered ===');
+        console.log('Props in effect:', props);
+        console.log('Flash in effect:', props?.flash);
+        
+        const flash = props?.flash;
         
         // Reset toast first
         setShowToast(false);
         
         setTimeout(() => {
             if (flash?.success) {
-                console.log('Setting SUCCESS toast:', flash.success);
+                console.log('Setting SUCCESS toast with message:', flash.success);
                 setToastConfig({
                     type: 'success',
                     message: flash.success,
                     details: flash.import_errors || []
                 });
                 setShowToast(true);
+                console.log('Toast state set to TRUE');
             } else if (flash?.error) {
-                console.log('Setting ERROR toast:', flash.error);
+                console.log('Setting ERROR toast with message:', flash.error);
                 setToastConfig({
                     type: 'error',
                     message: flash.error,
                     details: flash.import_errors || []
                 });
                 setShowToast(true);
+                console.log('Toast state set to TRUE');
             }
         }, 100);
-    }, [flash]);
+    }, [props]);
 
     const resetFormData = () => ({
         nidn: '',
@@ -85,7 +119,7 @@ export default function DosenIndex({ dosen, filters }) {
         password: ''
     });
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get('/admin/dosen', { search }, {
             preserveState: true,
@@ -93,14 +127,14 @@ export default function DosenIndex({ dosen, filters }) {
         });
     };
 
-    const handleDelete = (dsn) => {
+    const handleDelete = (dsn: Dosen) => {
         setSelectedDosen(dsn);
         setShowDeleteModal(true);
     };
 
     const confirmDelete = () => {
         if (selectedDosen) {
-            router.post(`/admin/dosen/${selectedDosen.id}`, {
+            router.post(`/admin/dosen/${selectedDosen?.id}`, {
                 _method: 'DELETE'
             }, {
                 onSuccess: () => {
@@ -116,7 +150,7 @@ export default function DosenIndex({ dosen, filters }) {
         setShowCreateModal(true);
     };
 
-    const handleEdit = (dsn) => {
+    const handleEdit = (dsn: Dosen) => {
         setSelectedDosen(dsn);
         setFormData({
             nidn: dsn.nidn,
@@ -127,7 +161,7 @@ export default function DosenIndex({ dosen, filters }) {
         setShowEditModal(true);
     };
 
-    const handleSubmitCreate = (e) => {
+    const handleSubmitCreate = (e: React.FormEvent) => {
         e.preventDefault();
         router.post('/admin/dosen', formData, {
             onSuccess: () => {
@@ -137,9 +171,9 @@ export default function DosenIndex({ dosen, filters }) {
         });
     };
 
-    const handleSubmitEdit = (e) => {
+    const handleSubmitEdit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post(`/admin/dosen/${selectedDosen.id}`, {
+        router.post(`/admin/dosen/${selectedDosen?.id}`, {
             ...formData,
             _method: 'PUT'
         }, {
@@ -150,16 +184,35 @@ export default function DosenIndex({ dosen, filters }) {
         });
     };
 
-    const handleImport = (e) => {
+    const handleImport = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!importFile) {
+            alert('Silakan pilih file terlebih dahulu');
+            return;
+        }
+        
+        console.log('Importing file:', importFile);
+        console.log('File type:', importFile.type);
+        console.log('File name:', importFile.name);
+        
         const formData = new FormData();
-        formData.append('file', importFile);
+        formData.append('file', importFile, importFile.name);
+        
+        console.log('FormData created, posting to server...');
 
         router.post('/admin/dosen/import', formData, {
-            onSuccess: () => {
+            forceFormData: true,
+            preserveState: false,
+            preserveScroll: false,
+            onSuccess: (page) => {
+                console.log('Import success:', page.props.flash);
                 setShowImportModal(false);
                 setImportFile(null);
-            }
+            },
+            onError: (errors) => {
+                console.log('Import errors:', errors);
+            },
         });
     };
 
@@ -203,23 +256,8 @@ export default function DosenIndex({ dosen, filters }) {
                             </button>
                         </div>
 
-                        {/* Flash Messages */}
-                        {flash?.success && (
-                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900 border-l-4 border-green-500 dark:border-green-400 text-green-700 dark:text-green-200 px-6 py-4 rounded-xl shadow-lg flex items-center animate-fade-in">
-                                <svg className="w-6 h-6 mr-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="font-medium">{flash.success}</span>
-                            </div>
-                        )}
-                        {flash?.error && (
-                            <div className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900 dark:to-pink-900 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-200 px-6 py-4 rounded-xl shadow-lg flex items-center animate-fade-in">
-                                <svg className="w-6 h-6 mr-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                </svg>
-                                <span className="font-medium">{flash.error}</span>
-                            </div>
-                        )}
+                        {/* Flash Messages - Now handled by Toast */}
+                        {/* Keeping this for backward compatibility but Toast is preferred */}
 
                         {/* Search */}
                         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
@@ -282,12 +320,12 @@ export default function DosenIndex({ dosen, filters }) {
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {dosen.data.length === 0 ? (
                                         <tr>
-                                            <td colSpan="6" className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                            <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                                 Tidak ada data dosen
                                             </td>
                                         </tr>
                                     ) : (
-                                        dosen.data.map((dsn) => (
+                                        dosen.data.map((dsn: Dosen) => (
                                             <tr key={dsn.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                                     {dsn.nidn}
@@ -341,7 +379,7 @@ export default function DosenIndex({ dosen, filters }) {
                                             Menampilkan {dosen.from} - {dosen.to} dari {dosen.total} data
                                         </div>
                                         <div className="flex gap-2">
-                                            {dosen.links.map((link, index) => {
+                                            {dosen.links.map((link: any, index: number) => {
                                                 const Component = link.url ? 'a' : 'span';
                                                 return (
                                                     <Component
@@ -412,10 +450,13 @@ export default function DosenIndex({ dosen, filters }) {
             {/* Toast Notification */}
             {showToast && (
                 <Toast
-                    type={toastConfig.type}
+                    type={toastConfig.type as 'success' | 'error' | 'warning' | 'info'}
                     message={toastConfig.message}
                     details={toastConfig.details}
-                    onClose={() => setShowToast(false)}
+                    onClose={() => {
+                        console.log('Toast onClose called');
+                        setShowToast(false);
+                    }}
                     duration={toastConfig.details?.length > 0 ? 8000 : 5000}
                 />
             )}

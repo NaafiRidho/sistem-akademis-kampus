@@ -7,7 +7,7 @@
     <title inertia>{{ config('app.name', 'Sistem Akademis Kampus') }}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     @viteReactRefresh
-    @vite('resources/js/app.jsx')
+    @vite('resources/js/app.tsx')
     @inertiaHead
 </head>
 

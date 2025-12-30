@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class DosenController extends Controller
@@ -143,15 +144,24 @@ class DosenController extends Controller
 
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
-        ]);
-
+        Log::info('=== DOSEN IMPORT START ===');
+        Log::info('Request has file?', ['has_file' => $request->hasFile('file')]);
+        Log::info('Request file()', ['file' => $request->file('file')]);
+        Log::info('Request all()', ['all' => $request->all()]);
+        
         try {
+            $validated = $request->validate([
+                'file' => 'required|file|extensions:xlsx,xls,csv|max:10240'
+            ]);
+            Log::info('Validation passed');
+
             $file = $request->file('file');
+            Log::info('File received', ['name' => $file->getClientOriginalName()]);
+            
             $spreadsheet = IOFactory::load($file->getRealPath());
             $sheet = $spreadsheet->getActiveSheet();
             $rows = $sheet->toArray();
+            Log::info('Excel loaded', ['row_count' => count($rows)]);
 
             // Skip header row
             array_shift($rows);
@@ -178,10 +188,17 @@ class DosenController extends Controller
                         continue;
                     }
 
+                    // Check if email already exists
+                    $email = $row[3] ?? $row[0] . '@lecturer.ac.id';
+                    if (User::where('email', $email)->exists()) {
+                        $errors[] = "Baris " . ($index + 2) . ": Email {$email} sudah digunakan";
+                        continue;
+                    }
+
                     // Create user
                     $user = User::create([
                         'name' => $row[1],
-                        'email' => $row[3] ?? $row[0] . '@lecturer.ac.id',
+                        'email' => $email,
                         'password' => Hash::make($row[4] ?? '12345678'),
                         'role_id' => 2
                     ]);
@@ -197,23 +214,41 @@ class DosenController extends Controller
                     $imported++;
                 } catch (\Exception $e) {
                     $errors[] = "Baris " . ($index + 2) . ": " . $e->getMessage();
+                    Log::error('Dosen import row error', ['row' => $index + 2, 'error' => $e->getMessage()]);
                 }
             }
 
             DB::commit();
+
+            Log::info("Import completed. Imported: {$imported}, Errors: " . count($errors));
+
+            if ($imported === 0 && !empty($errors)) {
+                return redirect()->route('admin.dosen.index')
+                    ->with('error', 'Gagal mengimport data. ' . implode(', ', array_slice($errors, 0, 3)));
+            }
 
             $message = "Berhasil mengimport {$imported} data dosen";
             if (!empty($errors)) {
                 $message .= ". Terdapat " . count($errors) . " error";
             }
 
+            Log::info('Redirecting with flash message: ' . $message);
+
             return redirect()->route('admin.dosen.index')
-                ->with('success', $message)
-                ->with('import_errors', $errors);
+                ->with([
+                    'success' => $message,
+                    'import_errors' => $errors
+                ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Gagal mengimport data: ' . $e->getMessage()]);
+            Log::error('Dosen import failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('admin.dosen.index')
+                ->with('error', 'Gagal mengimport data: ' . $e->getMessage());
         }
     }
 
