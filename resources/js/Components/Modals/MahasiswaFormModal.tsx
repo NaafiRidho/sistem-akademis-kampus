@@ -1,9 +1,60 @@
-export default function MahasiswaFormModal({ show, onClose, onSubmit, formData, setFormData, prodis, kelas, isEdit = false }) {
+import LoadingButton from '../LoadingButton';
+
+interface Prodi {
+    id: number;
+    nama_prodi: string;
+    fakultas?: {
+        nama_fakultas: string;
+    };
+}
+
+interface Kelas {
+    id: number;
+    nama_kelas: string;
+    semester: number;
+    prodi_id: number;
+}
+
+interface MahasiswaFormData {
+    nim: string;
+    nama: string;
+    prodi_id: string;
+    kelas_id: string;
+    angkatan: string;
+    jenis_kelamin: string;
+    email: string;
+    password: string;
+    alamat: string;
+}
+
+interface MahasiswaFormModalProps {
+    show: boolean;
+    onClose: () => void;
+    onSubmit: (e: React.FormEvent) => void;
+    formData: MahasiswaFormData;
+    setFormData: (data: MahasiswaFormData) => void;
+    prodis: Prodi[];
+    kelas: Kelas[];
+    isEdit?: boolean;
+    loading?: boolean;
+}
+
+export default function MahasiswaFormModal({ 
+    show, 
+    onClose, 
+    onSubmit, 
+    formData, 
+    setFormData, 
+    prodis, 
+    kelas, 
+    isEdit = false, 
+    loading = false 
+}: MahasiswaFormModalProps) {
     if (!show) return null;
 
     // Filter kelas berdasarkan prodi yang dipilih
     const filteredKelas = formData.prodi_id 
-        ? kelas?.filter(k => k.prodi_id === parseInt(formData.prodi_id))
+        ? kelas?.filter((k: Kelas) => k.prodi_id === parseInt(formData.prodi_id))
         : kelas;
 
     return (
@@ -43,7 +94,7 @@ export default function MahasiswaFormModal({ show, onClose, onSubmit, formData, 
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             >
                                 <option value="">Pilih Prodi</option>
-                                {prodis.map((prodi) => (
+                                {prodis.map((prodi: Prodi) => (
                                     <option key={prodi.id} value={prodi.id}>
                                         {prodi.nama_prodi} - {prodi.fakultas?.nama_fakultas}
                                     </option>
@@ -59,7 +110,7 @@ export default function MahasiswaFormModal({ show, onClose, onSubmit, formData, 
                                 disabled={!formData.prodi_id}
                             >
                                 <option value="">Pilih Kelas</option>
-                                {filteredKelas?.map((k) => (
+                                {filteredKelas?.map((k: Kelas) => (
                                     <option key={k.id} value={k.id}>
                                         {k.nama_kelas} - Semester {k.semester}
                                     </option>
@@ -114,7 +165,7 @@ export default function MahasiswaFormModal({ show, onClose, onSubmit, formData, 
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Alamat</label>
                             <textarea
-                                rows="3"
+                                rows={3}
                                 value={formData.alamat}
                                 onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
@@ -122,16 +173,18 @@ export default function MahasiswaFormModal({ show, onClose, onSubmit, formData, 
                         </div>
                     </div>
                     <div className="flex gap-2 mt-6">
-                        <button
+                        <LoadingButton
                             type="submit"
-                            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                            loading={loading}
+                            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                         >
                             {isEdit ? 'Update' : 'Simpan'}
-                        </button>
+                        </LoadingButton>
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
+                            disabled={loading}
+                            className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 disabled:opacity-50"
                         >
                             Batal
                         </button>
