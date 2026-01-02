@@ -1,5 +1,10 @@
-export default function MahasiswaFormModal({ show, onClose, onSubmit, formData, setFormData, prodis, isEdit = false }) {
+export default function MahasiswaFormModal({ show, onClose, onSubmit, formData, setFormData, prodis, kelas, isEdit = false }) {
     if (!show) return null;
+
+    // Filter kelas berdasarkan prodi yang dipilih
+    const filteredKelas = formData.prodi_id 
+        ? kelas?.filter(k => k.prodi_id === parseInt(formData.prodi_id))
+        : kelas;
 
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start justify-center p-4">
@@ -34,13 +39,29 @@ export default function MahasiswaFormModal({ show, onClose, onSubmit, formData, 
                             <select
                                 required
                                 value={formData.prodi_id}
-                                onChange={(e) => setFormData({ ...formData, prodi_id: e.target.value })}
+                                onChange={(e) => setFormData({ ...formData, prodi_id: e.target.value, kelas_id: '' })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             >
                                 <option value="">Pilih Prodi</option>
                                 {prodis.map((prodi) => (
                                     <option key={prodi.id} value={prodi.id}>
                                         {prodi.nama_prodi} - {prodi.fakultas?.nama_fakultas}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kelas</label>
+                            <select
+                                value={formData.kelas_id || ''}
+                                onChange={(e) => setFormData({ ...formData, kelas_id: e.target.value })}
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
+                                disabled={!formData.prodi_id}
+                            >
+                                <option value="">Pilih Kelas</option>
+                                {filteredKelas?.map((k) => (
+                                    <option key={k.id} value={k.id}>
+                                        {k.nama_kelas} - Semester {k.semester}
                                     </option>
                                 ))}
                             </select>

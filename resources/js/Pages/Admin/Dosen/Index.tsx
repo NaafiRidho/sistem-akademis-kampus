@@ -14,7 +14,23 @@ interface Dosen {
     email: string;
     no_telepon?: string;
     pendidikan_terakhir?: string;
+    prodi_id?: number;
+    prodi?: {
+        id: number;
+        nama_prodi: string;
+        fakultas?: {
+            nama_fakultas: string;
+        };
+    };
     user?: { email: string };
+}
+
+interface Prodi {
+    id: number;
+    nama_prodi: string;
+    fakultas?: {
+        nama_fakultas: string;
+    };
 }
 
 interface PageProps {
@@ -25,12 +41,13 @@ interface PageProps {
         to: number;
         total: number;
     };
+    prodis: Prodi[];
     filters: {
         search?: string;
     };
 }
 
-export default function DosenIndex({ dosen, filters }: PageProps) {
+export default function DosenIndex({ dosen, prodis, filters }: PageProps) {
     const page = usePage();
     const props = page.props as any;
     const flash = props.flash as { success?: string; error?: string; import_errors?: string[] };
@@ -67,7 +84,10 @@ export default function DosenIndex({ dosen, filters }: PageProps) {
         nidn: '',
         nama: '',
         email: '',
-        password: ''
+        password: '',
+        no_telepon: '',
+        pendidikan_terakhir: '',
+        prodi_id: ''
     });
 
     useEffect(() => {
@@ -116,7 +136,10 @@ export default function DosenIndex({ dosen, filters }: PageProps) {
         nidn: '',
         nama: '',
         email: '',
-        password: ''
+        password: '',
+        no_telepon: '',
+        pendidikan_terakhir: '',
+        prodi_id: ''
     });
 
     const handleSearch = (e: React.FormEvent) => {
@@ -156,7 +179,10 @@ export default function DosenIndex({ dosen, filters }: PageProps) {
             nidn: dsn.nidn,
             nama: dsn.nama,
             email: dsn.user?.email || dsn.email || '',
-            password: ''
+            password: '',
+            no_telepon: dsn.no_telepon || '',
+            pendidikan_terakhir: dsn.pendidikan_terakhir || '',
+            prodi_id: dsn.prodi_id?.toString() || ''
         });
         setShowEditModal(true);
     };
@@ -313,6 +339,9 @@ export default function DosenIndex({ dosen, filters }: PageProps) {
                                             Pendidikan
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Prodi Mengajar
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Aksi
                                         </th>
                                     </tr>
@@ -320,7 +349,7 @@ export default function DosenIndex({ dosen, filters }: PageProps) {
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {dosen.data.length === 0 ? (
                                         <tr>
-                                            <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                            <td colSpan={7} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                                 Tidak ada data dosen
                                             </td>
                                         </tr>
@@ -337,10 +366,13 @@ export default function DosenIndex({ dosen, filters }: PageProps) {
                                                     {dsn.email}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                    {dsn.no_telepon}
+                                                    {dsn.no_telepon || '-'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                    {dsn.pendidikan_terakhir}
+                                                    {dsn.pendidikan_terakhir || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
+                                                    {dsn.prodi ? dsn.prodi.nama_prodi : '-'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex items-center gap-2">
@@ -423,6 +455,7 @@ export default function DosenIndex({ dosen, filters }: PageProps) {
                 onSubmit={handleSubmitCreate}
                 formData={formData}
                 setFormData={setFormData}
+                prodis={prodis}
                 isEdit={false}
             />
 
@@ -432,6 +465,7 @@ export default function DosenIndex({ dosen, filters }: PageProps) {
                 onSubmit={handleSubmitEdit}
                 formData={formData}
                 setFormData={setFormData}
+                prodis={prodis}
                 isEdit={true}
             />
 

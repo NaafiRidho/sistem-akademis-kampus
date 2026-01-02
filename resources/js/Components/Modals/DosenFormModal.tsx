@@ -1,4 +1,4 @@
-export default function DosenFormModal({ show, onClose, onSubmit, formData, setFormData, isEdit = false }) {
+export default function DosenFormModal({ show, onClose, onSubmit, formData, setFormData, prodis, isEdit = false }) {
     if (!show) return null;
 
     return (
@@ -38,6 +38,45 @@ export default function DosenFormModal({ show, onClose, onSubmit, formData, setF
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Telepon</label>
+                            <input
+                                type="text"
+                                value={formData.no_telepon || ''}
+                                onChange={(e) => setFormData({ ...formData, no_telepon: e.target.value })}
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
+                                placeholder="08xxxxxxxxxx"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pendidikan Terakhir</label>
+                            <select
+                                value={formData.pendidikan_terakhir || ''}
+                                onChange={(e) => setFormData({ ...formData, pendidikan_terakhir: e.target.value })}
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
+                            >
+                                <option value="">Pilih Pendidikan</option>
+                                <option value="S1">S1</option>
+                                <option value="S2">S2</option>
+                                <option value="S3">S3</option>
+                                <option value="Profesor">Profesor</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program Studi Mengajar</label>
+                            <select
+                                value={formData.prodi_id || ''}
+                                onChange={(e) => setFormData({ ...formData, prodi_id: e.target.value })}
+                                className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
+                            >
+                                <option value="">Pilih Prodi</option>
+                                {prodis?.map((prodi: any) => (
+                                    <option key={prodi.id} value={prodi.id}>
+                                        {prodi.nama_prodi} - {prodi.fakultas?.nama_fakultas}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

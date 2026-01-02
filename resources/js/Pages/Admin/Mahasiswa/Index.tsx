@@ -12,17 +12,30 @@ interface Mahasiswa {
     nim: string;
     nama: string;
     prodi_id: number;
+    kelas_id?: number;
     angkatan: number;
     jenis_kelamin: string;
     alamat?: string;
     user?: { email: string };
     prodi?: { nama_prodi: string };
+    kelas?: { 
+        id: number;
+        nama_kelas: string;
+        semester: number;
+    };
 }
 
 interface Prodi {
     id: number;
     nama_prodi: string;
     fakultas?: { nama_fakultas: string };
+}
+
+interface Kelas {
+    id: number;
+    nama_kelas: string;
+    semester: number;
+    prodi_id: number;
 }
 
 interface PageProps {
@@ -34,13 +47,14 @@ interface PageProps {
         total: number;
     };
     prodis: Prodi[];
+    kelas: Kelas[];
     filters: {
         search?: string;
         prodi_id?: string;
     };
 }
 
-export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps) {
+export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: PageProps) {
     const page = usePage();
     const props = page.props as any;
     
@@ -79,6 +93,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
         nim: "",
         nama: "",
         prodi_id: "",
+        kelas_id: "",
         angkatan: "",
         jenis_kelamin: "L",
         alamat: "",
@@ -132,6 +147,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
         nim: "",
         nama: "",
         prodi_id: "",
+        kelas_id: "",
         angkatan: "",
         jenis_kelamin: "L",
         alamat: "",
@@ -184,6 +200,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
             nim: mhs.nim,
             nama: mhs.nama,
             prodi_id: String(mhs.prodi_id),
+            kelas_id: mhs.kelas_id ? String(mhs.kelas_id) : "",
             angkatan: String(mhs.angkatan),
             jenis_kelamin: mhs.jenis_kelamin,
             alamat: mhs.alamat || "",
@@ -382,6 +399,9 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                                             Prodi
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Kelas
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Angkatan
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -396,7 +416,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                                     {mahasiswa.data.length === 0 ? (
                                         <tr>
                                             <td
-                                                colSpan={6}
+                                                colSpan={7}
                                                 className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
                                             >
                                                 Tidak ada data mahasiswa
@@ -416,6 +436,13 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                                     {mhs.prodi?.nama_prodi}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                    {mhs.kelas ? (
+                                                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                            {mhs.kelas.nama_kelas}
+                                                        </span>
+                                                    ) : '-'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                                     {mhs.angkatan}
@@ -521,6 +548,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                 formData={formData}
                 setFormData={setFormData}
                 prodis={prodis}
+                kelas={kelas}
                 isEdit={false}
             />
 
@@ -531,6 +559,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, filters }: PageProps
                 formData={formData}
                 setFormData={setFormData}
                 prodis={prodis}
+                kelas={kelas}
                 isEdit={true}
             />
 

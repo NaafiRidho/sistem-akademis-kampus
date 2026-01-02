@@ -17,7 +17,7 @@ class MahasiswaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Mahasiswa::with(['prodi', 'user']);
+        $query = Mahasiswa::with(['prodi.fakultas', 'user', 'kelas']);
 
         // Search functionality
         if ($request->has('search')) {
@@ -35,10 +35,12 @@ class MahasiswaController extends Controller
 
         $mahasiswa = $query->orderBy('created_at', 'desc')->paginate(15);
         $prodis = Prodi::with('fakultas')->get();
+        $kelas = \App\Models\Kelas::with('prodi')->orderBy('nama_kelas')->get();
 
         return Inertia::render('Admin/Mahasiswa/Index', [
             'mahasiswa' => $mahasiswa,
             'prodis' => $prodis,
+            'kelas' => $kelas,
             'filters' => $request->only(['search', 'prodi_id'])
         ]);
     }
@@ -54,6 +56,7 @@ class MahasiswaController extends Controller
             'nim' => 'required|unique:mahasiswa,nim',
             'nama' => 'required|string|max:255',
             'prodi_id' => 'required|exists:prodi,id',
+            'kelas_id' => 'nullable|exists:kelas,id',
             'angkatan' => 'required|integer|min:2000|max:' . (date('Y') + 1),
             'jenis_kelamin' => 'required|in:L,P',
             'alamat' => 'nullable|string',
@@ -77,6 +80,7 @@ class MahasiswaController extends Controller
                 'nim' => $validated['nim'],
                 'nama' => $validated['nama'],
                 'prodi_id' => $validated['prodi_id'],
+                'kelas_id' => $validated['kelas_id'] ?? null,
                 'angkatan' => $validated['angkatan'],
                 'jenis_kelamin' => $validated['jenis_kelamin'],
                 'alamat' => $validated['alamat']
@@ -104,6 +108,7 @@ class MahasiswaController extends Controller
             'nim' => 'required|unique:mahasiswa,nim,' . $id,
             'nama' => 'required|string|max:255',
             'prodi_id' => 'required|exists:prodi,id',
+            'kelas_id' => 'nullable|exists:kelas,id',
             'angkatan' => 'required|integer|min:2000|max:' . (date('Y') + 1),
             'jenis_kelamin' => 'required|in:L,P',
             'alamat' => 'nullable|string',
@@ -130,6 +135,7 @@ class MahasiswaController extends Controller
                 'nim' => $validated['nim'],
                 'nama' => $validated['nama'],
                 'prodi_id' => $validated['prodi_id'],
+                'kelas_id' => $validated['kelas_id'] ?? null,
                 'angkatan' => $validated['angkatan'],
                 'jenis_kelamin' => $validated['jenis_kelamin'],
                 'alamat' => $validated['alamat']
@@ -266,11 +272,13 @@ class MahasiswaController extends Controller
                     ]);
 
                     // Create mahasiswa
+                    // Format Excel: NIM, Nama, Prodi_ID, Angkatan, Jenis_Kelamin, Email(optional), Password(optional), Alamat(optional), Kelas_ID(optional)
                     Mahasiswa::create([
                         'user_id' => $user->id,
                         'nim' => $row[0],
                         'nama' => $row[1],
                         'prodi_id' => $row[2],
+                        'kelas_id' => !empty($row[8]) ? $row[8] : null,
                         'angkatan' => $row[3] ?? date('Y'),
                         'jenis_kelamin' => $row[4] ?? 'L',
                         'alamat' => $row[7] ?? null
@@ -321,12 +329,12 @@ class MahasiswaController extends Controller
             'Content-Disposition' => 'attachment; filename="template_mahasiswa.csv"',
         ];
 
-        $columns = ['NIM', 'Nama', 'Prodi ID', 'Angkatan', 'Jenis Kelamin (L/P)', 'Email', 'Password', 'Alamat'];
+        $columns = ['NIM', 'Nama', 'Prodi ID', 'Angkatan', 'Jenis Kelamin (L/P)', 'Email', 'Password', 'Alamat', 'Kelas ID'];
 
         $callback = function() use ($columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
-            fputcsv($file, ['2024001', 'John Doe', '1', '2024', 'L', 'john@student.ac.id', '12345678', 'Jl. Example No. 1']);
+            fputcsv($file, ['2024001', 'John Doe', '1', '2024', 'L', 'john@student.ac.id', '12345678', 'Jl. Example No. 1', '1']);
             fclose($file);
         };
 

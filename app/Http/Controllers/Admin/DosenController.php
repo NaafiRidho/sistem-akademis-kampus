@@ -16,7 +16,7 @@ class DosenController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Dosen::with('user');
+        $query = Dosen::with(['user', 'prodi.fakultas']);
 
         // Search functionality
         if ($request->has('search')) {
@@ -24,14 +24,17 @@ class DosenController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('nidn', 'like', "%{$search}%")
                   ->orWhere('nama', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('no_telepon', 'like', "%{$search}%");
             });
         }
 
         $dosen = $query->orderBy('created_at', 'desc')->paginate(15);
+        $prodis = \App\Models\Prodi::with('fakultas')->orderBy('nama_prodi')->get();
 
         return Inertia::render('Admin/Dosen/Index', [
             'dosen' => $dosen,
+            'prodis' => $prodis,
             'filters' => $request->only(['search'])
         ]);
     }
@@ -47,7 +50,10 @@ class DosenController extends Controller
             'nidn' => 'required|unique:dosen,nidn',
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8'
+            'password' => 'required|min:8',
+            'no_telepon' => 'nullable|string|max:20',
+            'pendidikan_terakhir' => 'nullable|string|max:50',
+            'prodi_id' => 'nullable|exists:prodi,id'
         ]);
 
         DB::beginTransaction();
@@ -65,7 +71,10 @@ class DosenController extends Controller
                 'user_id' => $user->id,
                 'nidn' => $validated['nidn'],
                 'nama' => $validated['nama'],
-                'email' => $validated['email']
+                'email' => $validated['email'],
+                'no_telepon' => $validated['no_telepon'] ?? null,
+                'pendidikan_terakhir' => $validated['pendidikan_terakhir'] ?? null,
+                'prodi_id' => $validated['prodi_id'] ?? null
             ]);
 
             DB::commit();
@@ -90,7 +99,10 @@ class DosenController extends Controller
             'nidn' => 'required|unique:dosen,nidn,' . $id,
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $dosen->user_id,
-            'password' => 'nullable|min:8'
+            'password' => 'nullable|min:8',
+            'no_telepon' => 'nullable|string|max:20',
+            'pendidikan_terakhir' => 'nullable|string|max:50',
+            'prodi_id' => 'nullable|exists:prodi,id'
         ]);
 
         DB::beginTransaction();
@@ -111,7 +123,10 @@ class DosenController extends Controller
             $dosen->update([
                 'nidn' => $validated['nidn'],
                 'nama' => $validated['nama'],
-                'email' => $validated['email']
+                'email' => $validated['email'],
+                'no_telepon' => $validated['no_telepon'] ?? null,
+                'pendidikan_terakhir' => $validated['pendidikan_terakhir'] ?? null,
+                'prodi_id' => $validated['prodi_id'] ?? null
             ]);
 
             DB::commit();
@@ -204,11 +219,15 @@ class DosenController extends Controller
                     ]);
 
                     // Create dosen
+                    // Format Excel: NIDN, Nama, Email, Email_User(optional), Password(optional), No_Telepon(optional), Pendidikan(optional), Prodi_ID(optional)
                     Dosen::create([
                         'user_id' => $user->id,
                         'nidn' => $row[0],
                         'nama' => $row[1],
-                        'email' => $row[2]
+                        'email' => $row[2],
+                        'no_telepon' => $row[5] ?? null,
+                        'pendidikan_terakhir' => $row[6] ?? null,
+                        'prodi_id' => !empty($row[7]) ? $row[7] : null
                     ]);
 
                     $imported++;
@@ -259,12 +278,12 @@ class DosenController extends Controller
             'Content-Disposition' => 'attachment; filename="template_dosen.csv"',
         ];
 
-        $columns = ['NIDN', 'Nama', 'Email Dosen', 'Email Login', 'Password'];
+        $columns = ['NIDN', 'Nama', 'Email Dosen', 'Email Login', 'Password', 'No Telepon', 'Pendidikan Terakhir', 'Prodi ID'];
 
         $callback = function() use ($columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
-            fputcsv($file, ['0012345678', 'Dr. John Doe', 'john.doe@university.ac.id', 'john@lecturer.ac.id', '12345678']);
+            fputcsv($file, ['0012345678', 'Dr. John Doe', 'john.doe@university.ac.id', 'john@lecturer.ac.id', '12345678', '081234567890', 'S3', '1']);
             fclose($file);
         };
 

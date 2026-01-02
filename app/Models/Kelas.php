@@ -16,6 +16,11 @@ class Kelas extends Model
         return $this->belongsTo(Prodi::class);
     }
 
+    public function mahasiswa(): HasMany
+    {
+        return $this->hasMany(Mahasiswa::class);
+    }
+
     public function jadwal(): HasMany
     {
         return $this->hasMany(Jadwal::class);
