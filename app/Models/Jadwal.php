@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Jadwal extends Model
 {
     protected $table = 'jadwal';
-    protected $fillable = ['kelas_id', 'mata_kuliah_id', 'dosen_id', 'hari', 'jam_mulai', 'jam_selesai', 'ruangan'];
+    protected $fillable = ['kelas_id', 'mata_kuliah_id', 'dosen_id', 'hari', 'hari_order', 'jam_mulai', 'jam_selesai', 'ruangan'];
 
     protected $casts = [
         'jam_mulai' => 'datetime:H:i',
