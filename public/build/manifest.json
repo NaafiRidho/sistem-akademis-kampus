@@ -1,0 +1,196 @@
+{
+  "_Header-Dgp0CeEs.js": {
+    "file": "assets/Header-Dgp0CeEs.js",
+    "name": "Header",
+    "imports": [
+      "resources/js/app.tsx"
+    ]
+  },
+  "_Toast-D0EGW6dg.js": {
+    "file": "assets/Toast-D0EGW6dg.js",
+    "name": "Toast",
+    "imports": [
+      "resources/js/app.tsx"
+    ]
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-CrVg06a6.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Absensi/Index.tsx": {
+    "file": "assets/Index-C5R1Iyj0.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Absensi/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js",
+      "_Toast-D0EGW6dg.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Dashboard.tsx": {
+    "file": "assets/Dashboard-DdBBiort.js",
+    "name": "Dashboard",
+    "src": "resources/js/Pages/Admin/Dashboard.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Dosen/Index.tsx": {
+    "file": "assets/Index-CFJl1WV6.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Dosen/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js",
+      "_Toast-D0EGW6dg.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Fakultas/Index.tsx": {
+    "file": "assets/Index-dRKR4pxk.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Fakultas/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js",
+      "_Toast-D0EGW6dg.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Jadwal/Index.tsx": {
+    "file": "assets/Index-DZhxbMdW.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Jadwal/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js",
+      "_Toast-D0EGW6dg.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Mahasiswa/Index.tsx": {
+    "file": "assets/Index-D4Fl0VK2.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Mahasiswa/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js",
+      "_Toast-D0EGW6dg.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/MataKuliah/Index.tsx": {
+    "file": "assets/Index-CaT8seH-.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/MataKuliah/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js",
+      "_Toast-D0EGW6dg.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Nilai/Index.tsx": {
+    "file": "assets/Index-BaH0TE2V.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Nilai/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js",
+      "_Toast-D0EGW6dg.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Admin/Prodi/Index.tsx": {
+    "file": "assets/Index-lEU0x-Nx.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Admin/Prodi/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-Dgp0CeEs.js",
+      "_Toast-D0EGW6dg.js"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Auth/Login.tsx": {
+    "file": "assets/Login-BbLJmjWu.js",
+    "name": "Login",
+    "src": "resources/js/Pages/Auth/Login.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/Pages/Welcome.tsx": {
+    "file": "assets/Welcome-CC6zWvu8.js",
+    "name": "Welcome",
+    "src": "resources/js/Pages/Welcome.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  },
+  "resources/js/app.tsx": {
+    "file": "assets/app-rqAKm7F0.js",
+    "name": "app",
+    "src": "resources/js/app.tsx",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/Pages/Admin/Absensi/Index.tsx",
+      "resources/js/Pages/Admin/Dashboard.tsx",
+      "resources/js/Pages/Admin/Dosen/Index.tsx",
+      "resources/js/Pages/Admin/Fakultas/Index.tsx",
+      "resources/js/Pages/Admin/Jadwal/Index.tsx",
+      "resources/js/Pages/Admin/Mahasiswa/Index.tsx",
+      "resources/js/Pages/Admin/MataKuliah/Index.tsx",
+      "resources/js/Pages/Admin/Nilai/Index.tsx",
+      "resources/js/Pages/Admin/Prodi/Index.tsx",
+      "resources/js/Pages/Auth/Login.tsx",
+      "resources/js/Pages/Welcome.tsx"
+    ],
+    "css": [
+      "assets/app-CrVg06a6.css"
+    ]
+  }
+}
