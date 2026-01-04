@@ -8,12 +8,13 @@ interface ImportModalProps {
     setFile: (file: File | null) => void;
     templateUrl: string;
     entityName: string;
+    isLoading?: boolean;
 }
 
-export default function ImportModal({ show, onClose, onSubmit, file, setFile, templateUrl, entityName }: ImportModalProps) {
+export default function ImportModal({ show, onClose, onSubmit, file, setFile, templateUrl, entityName, isLoading = false }: ImportModalProps) {
     if (!show) return null;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!file) {
             alert('Pilih file terlebih dahulu');
@@ -60,14 +61,22 @@ export default function ImportModal({ show, onClose, onSubmit, file, setFile, te
                     <div className="flex gap-2">
                         <button
                             type="submit"
-                            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                            disabled={isLoading}
+                            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                            Import
+                            {isLoading && (
+                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            )}
+                            {isLoading ? 'Mengimport...' : 'Import'}
                         </button>
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
+                            disabled={isLoading}
+                            className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Batal
                         </button>

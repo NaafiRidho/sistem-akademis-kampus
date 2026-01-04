@@ -49,4 +49,25 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::resource('prodi', \App\Http\Controllers\Admin\ProdiController::class);
     Route::post('prodi/import', [\App\Http\Controllers\Admin\ProdiController::class, 'import'])->name('prodi.import');
     Route::get('prodi/template/download', [\App\Http\Controllers\Admin\ProdiController::class, 'downloadTemplate'])->name('prodi.template');
+    
+    // Mata Kuliah CRUD
+    Route::post('matakuliah/import', [\App\Http\Controllers\Admin\MataKuliahController::class, 'import'])->name('matakuliah.import');
+    Route::get('matakuliah/template/download', [\App\Http\Controllers\Admin\MataKuliahController::class, 'downloadTemplate'])->name('matakuliah.template');
+    Route::resource('matakuliah', \App\Http\Controllers\Admin\MataKuliahController::class);
+    
+    // Jadwal CRUD
+    Route::resource('jadwal', \App\Http\Controllers\Admin\JadwalController::class);
+    Route::post('jadwal/import', [\App\Http\Controllers\Admin\JadwalController::class, 'import'])->name('jadwal.import');
+    Route::get('jadwal/template/download', [\App\Http\Controllers\Admin\JadwalController::class, 'downloadTemplate'])->name('jadwal.template');
+    
+    // Nilai CRUD
+    Route::resource('nilai', \App\Http\Controllers\Admin\NilaiController::class);
+    Route::post('nilai/import', [\App\Http\Controllers\Admin\NilaiController::class, 'import'])->name('nilai.import');
+    Route::get('nilai/template/download', [\App\Http\Controllers\Admin\NilaiController::class, 'downloadTemplate'])->name('nilai.template');
+    
+    // Absensi CRUD
+    Route::resource('absensi', \App\Http\Controllers\Admin\AbsensiController::class);
+    Route::post('absensi/import', [\App\Http\Controllers\Admin\AbsensiController::class, 'import'])->name('absensi.import');
+    Route::get('absensi/template/download', [\App\Http\Controllers\Admin\AbsensiController::class, 'downloadTemplate'])->name('absensi.template');
+    Route::get('absensi/rekap/{mahasiswa}', [\App\Http\Controllers\Admin\AbsensiController::class, 'rekap'])->name('absensi.rekap');
 });

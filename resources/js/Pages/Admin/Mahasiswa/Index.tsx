@@ -89,6 +89,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedMahasiswa, setSelectedMahasiswa] = useState<Mahasiswa | null>(null);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         nim: "",
         nama: "",
@@ -212,16 +213,25 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
 
     const handleSubmitCreate = (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         router.post("/admin/mahasiswa", formData, {
             onSuccess: () => {
                 setShowCreateModal(false);
                 setFormData(resetFormData());
+                setLoading(false);
             },
+            onError: () => {
+                setLoading(false);
+            },
+            onFinish: () => {
+                setLoading(false);
+            }
         });
     };
 
     const handleSubmitEdit = (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         router.post(
             `/admin/mahasiswa/${selectedMahasiswa?.id}`,
             {
@@ -232,7 +242,14 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
                 onSuccess: () => {
                     setShowEditModal(false);
                     setSelectedMahasiswa(null);
+                    setLoading(false);
                 },
+                onError: () => {
+                    setLoading(false);
+                },
+                onFinish: () => {
+                    setLoading(false);
+                }
             }
         );
     };
@@ -549,6 +566,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
                 setFormData={setFormData}
                 prodis={prodis}
                 kelas={kelas}
+                loading={loading}
                 isEdit={false}
             />
 
@@ -560,6 +578,7 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
                 setFormData={setFormData}
                 prodis={prodis}
                 kelas={kelas}
+                loading={loading}
                 isEdit={true}
             />
 

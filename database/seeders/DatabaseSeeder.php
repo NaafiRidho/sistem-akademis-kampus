@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             DosenSeeder::class,
             MahasiswaSeeder::class,
+            MataKuliahSeeder::class,
         ]);
 
         // User::factory(10)->create();

@@ -35,6 +35,30 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeMenu = 'das
             path: '/admin/prodi',
             icon: 'M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z',
             key: 'prodi'
+        },
+        {
+            name: 'Mata Kuliah',
+            path: '/admin/matakuliah',
+            icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
+            key: 'matakuliah'
+        },
+        {
+            name: 'Jadwal Kuliah',
+            path: '/admin/jadwal',
+            icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+            key: 'jadwal'
+        },
+        {
+            name: 'Nilai Mahasiswa',
+            path: '/admin/nilai',
+            icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+            key: 'nilai'
+        },
+        {
+            name: 'Absensi',
+            path: '/admin/absensi',
+            icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+            key: 'absensi'
         }
     ];
 
@@ -51,48 +75,50 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeMenu = 'das
             <aside className={`fixed top-0 left-0 z-40 h-screen transition-transform ${
                 sidebarOpen ? 'translate-x-0' : '-translate-x-full'
             } w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700`}>
-                <div className="h-full px-3 py-4 overflow-y-auto">
-                {/* Logo */}
-                <div className="flex items-center justify-center mb-8 p-4">
-                    <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
+                <div className="h-full flex flex-col">
+                    {/* Logo */}
+                    <div className="flex items-center justify-center mb-6 p-4 flex-shrink-0">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                            <span className="text-xl font-bold text-gray-800 dark:text-white">Admin Panel</span>
                         </div>
-                        <span className="text-xl font-bold text-gray-800 dark:text-white">Admin Panel</span>
+                    </div>
+
+                    {/* Navigation - Scrollable */}
+                    <div className="flex-1 overflow-y-auto px-3 pb-4">
+                        <ul className="space-y-2 font-medium">
+                            {menuItems.map((item) => (
+                                <li key={item.key}>
+                                    <a
+                                        href={item.path}
+                                        className={`flex items-center p-3 rounded-lg group ${
+                                            activeMenu === item.key
+                                                ? 'text-white bg-gradient-to-r from-blue-600 to-purple-600'
+                                                : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                                        }`}
+                                    >
+                                        <svg
+                                            className={`w-5 h-5 ${
+                                                activeMenu === item.key
+                                                    ? 'text-white'
+                                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
+                                            }`}
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d={item.icon} fillRule="evenodd" clipRule="evenodd" />
+                                        </svg>
+                                        <span className="ml-3">{item.name}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
-
-                {/* Navigation */}
-                <ul className="space-y-2 font-medium">
-                    {menuItems.map((item) => (
-                        <li key={item.key}>
-                            <a
-                                href={item.path}
-                                className={`flex items-center p-3 rounded-lg group ${
-                                    activeMenu === item.key
-                                        ? 'text-white bg-gradient-to-r from-blue-600 to-purple-600'
-                                        : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                                }`}
-                            >
-                                <svg
-                                    className={`w-5 h-5 ${
-                                        activeMenu === item.key
-                                            ? 'text-white'
-                                            : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
-                                    }`}
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                >
-                                    <path d={item.icon} fillRule="evenodd" clipRule="evenodd" />
-                                </svg>
-                                <span className="ml-3">{item.name}</span>
-                            </a>
-                        </li>
-                    ))}
-                </ul>
-            </div>
             </aside>
         </>
     );
