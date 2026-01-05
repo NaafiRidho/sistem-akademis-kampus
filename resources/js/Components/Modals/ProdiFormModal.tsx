@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useForm } from 'react-hook-form';
+
+interface ProdiFormData {
+    nama_prodi: string;
+    fakultas_id: string;
+}
 
 interface ProdiFormModalProps {
     show: boolean;
     onClose: () => void;
     onSubmit: (e: React.FormEvent) => void;
-    formData: {
-        nama_prodi: string;
-        fakultas_id: string;
-    };
+    formData: ProdiFormData;
     setFormData: (data: any) => void;
     fakultas?: Array<{ id: number; nama_fakultas: string }>;
     isEdit: boolean;
@@ -23,11 +26,23 @@ export default function ProdiFormModal({
     fakultas = [],
     isEdit
 }: ProdiFormModalProps) {
-    console.log('🚀 ProdiFormModal - show:', show);
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<ProdiFormData>({
+        defaultValues: formData
+    });
+
+    useEffect(() => {
+        if (show) {
+            reset(formData);
+        }
+    }, [show, formData, reset]);
     
     if (!show) return null;
 
-    console.log('✅ ProdiModal RENDERING via Portal');
+    const handleFormSubmit = (data: ProdiFormData) => {
+        Object.assign(formData, data);
+        setFormData(data);
+        onSubmit({ preventDefault: () => {} } as React.FormEvent);
+    };
 
     return createPortal(
         <div 
@@ -49,7 +64,7 @@ export default function ProdiFormModal({
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4"
                 onClick={(e) => e.stopPropagation()}
             >
-                <form onSubmit={onSubmit}>
+                <form onSubmit={handleSubmit(handleFormSubmit)}>
                     <div className="px-6 pt-6 pb-4">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -72,10 +87,8 @@ export default function ProdiFormModal({
                                         Fakultas <span className="text-red-500">*</span>
                                     </label>
                                     <select
-                                        value={formData.fakultas_id}
-                                        onChange={(e) => setFormData({ ...formData, fakultas_id: e.target.value })}
+                                        {...register('fakultas_id', { required: 'Fakultas wajib dipilih' })}
                                         className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        required
                                     >
                                         <option value="">Pilih Fakultas</option>
                                         {fakultas.map((fak) => (
@@ -84,6 +97,7 @@ export default function ProdiFormModal({
                                             </option>
                                         ))}
                                     </select>
+                                    {errors.fakultas_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.fakultas_id.message}</p>}
                                 </div>
 
                                 <div>
@@ -92,12 +106,11 @@ export default function ProdiFormModal({
                                     </label>
                                     <input
                                         type="text"
-                                        value={formData.nama_prodi}
-                                        onChange={(e) => setFormData({ ...formData, nama_prodi: e.target.value })}
+                                        {...register('nama_prodi', { required: 'Nama program studi wajib diisi' })}
                                         className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="Contoh: Teknik Informatika"
-                                        required
                                     />
+                                    {errors.nama_prodi && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nama_prodi.message}</p>}
                                 </div>
                             </div>
                         </div>

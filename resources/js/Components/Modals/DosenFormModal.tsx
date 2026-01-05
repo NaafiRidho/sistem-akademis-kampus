@@ -1,5 +1,34 @@
-export default function DosenFormModal({ show, onClose, onSubmit, formData, setFormData, prodis, isEdit = false }) {
+import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+
+interface DosenFormData {
+    nidn: string;
+    nama: string;
+    email: string;
+    no_telepon?: string;
+    pendidikan_terakhir?: string;
+    prodi_id?: string;
+    password: string;
+}
+
+export default function DosenFormModal({ show, onClose, onSubmit, formData, prodis, isEdit = false }: any) {
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<DosenFormData>({
+        defaultValues: formData
+    });
+
+    useEffect(() => {
+        if (show) {
+            reset(formData);
+        }
+    }, [show, formData, reset]);
+
     if (!show) return null;
+
+    const handleFormSubmit = (data: DosenFormData) => {
+        const e = { preventDefault: () => {} } as React.FormEvent;
+        Object.assign(formData, data);
+        onSubmit(e);
+    };
 
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start justify-center p-4">
@@ -7,44 +36,46 @@ export default function DosenFormModal({ show, onClose, onSubmit, formData, setF
                 <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                     {isEdit ? 'Edit Data Dosen' : 'Tambah Data Dosen'}
                 </h3>
-                <form onSubmit={onSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">NIDN *</label>
                             <input
                                 type="text"
-                                required
-                                value={formData.nidn}
-                                onChange={(e) => setFormData({ ...formData, nidn: e.target.value })}
+                                {...register('nidn', { required: 'NIDN wajib diisi' })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.nidn && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nidn.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama *</label>
                             <input
                                 type="text"
-                                required
-                                value={formData.nama}
-                                onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                                {...register('nama', { required: 'Nama wajib diisi' })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.nama && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nama.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
                             <input
                                 type="email"
-                                required
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                {...register('email', { 
+                                    required: 'Email wajib diisi',
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                        message: 'Format email tidak valid'
+                                    }
+                                })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Telepon</label>
                             <input
                                 type="text"
-                                value={formData.no_telepon || ''}
-                                onChange={(e) => setFormData({ ...formData, no_telepon: e.target.value })}
+                                {...register('no_telepon')}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                                 placeholder="08xxxxxxxxxx"
                             />
@@ -52,8 +83,7 @@ export default function DosenFormModal({ show, onClose, onSubmit, formData, setF
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pendidikan Terakhir</label>
                             <select
-                                value={formData.pendidikan_terakhir || ''}
-                                onChange={(e) => setFormData({ ...formData, pendidikan_terakhir: e.target.value })}
+                                {...register('pendidikan_terakhir')}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             >
                                 <option value="">Pilih Pendidikan</option>
@@ -66,8 +96,7 @@ export default function DosenFormModal({ show, onClose, onSubmit, formData, setF
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program Studi Mengajar</label>
                             <select
-                                value={formData.prodi_id || ''}
-                                onChange={(e) => setFormData({ ...formData, prodi_id: e.target.value })}
+                                {...register('prodi_id')}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             >
                                 <option value="">Pilih Prodi</option>
@@ -85,11 +114,13 @@ export default function DosenFormModal({ show, onClose, onSubmit, formData, setF
                             </label>
                             <input
                                 type="password"
-                                required={!isEdit}
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                {...register('password', { 
+                                    required: !isEdit ? 'Password wajib diisi' : false,
+                                    minLength: { value: 6, message: 'Password minimal 6 karakter' }
+                                })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.password && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>}
                         </div>
                     </div>
                     <div className="flex gap-2 mt-6">

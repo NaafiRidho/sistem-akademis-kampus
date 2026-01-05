@@ -1,22 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useForm } from 'react-hook-form';
+
+interface MataKuliahFormData {
+    kode_mk: string;
+    nama_mk: string;
+    sks: string;
+    prodi_id: string;
+}
 
 interface MataKuliahFormModalProps {
     show: boolean;
     onClose: () => void;
     onSubmit: (e: React.FormEvent) => void;
-    formData: {
-        kode_mk: string;
-        nama_mk: string;
-        sks: string;
-        prodi_id: string;
-    };
-    setFormData: React.Dispatch<React.SetStateAction<{
-        kode_mk: string;
-        nama_mk: string;
-        sks: string;
-        prodi_id: string;
-    }>>;
+    formData: MataKuliahFormData;
+    setFormData: React.Dispatch<React.SetStateAction<MataKuliahFormData>>;
     prodi: Array<{
         id: number;
         nama_prodi: string;
@@ -38,11 +36,23 @@ export default function MataKuliahFormModal({
     isEdit,
     isLoading = false
 }: MataKuliahFormModalProps) {
-    console.log('🚀 MataKuliahFormModal - show:', show, 'isLoading:', isLoading);
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<MataKuliahFormData>({
+        defaultValues: formData
+    });
+
+    useEffect(() => {
+        if (show) {
+            reset(formData);
+        }
+    }, [show, formData, reset]);
     
     if (!show) return null;
 
-    console.log('✅ MataKuliahModal RENDERING via Portal');
+    const handleFormSubmit = (data: MataKuliahFormData) => {
+        Object.assign(formData, data);
+        setFormData(data);
+        onSubmit({ preventDefault: () => {} } as React.FormEvent);
+    };
 
     return createPortal(
         <div 
@@ -55,7 +65,6 @@ export default function MataKuliahFormModal({
             }}
             onClick={(e) => {
                 if (e.target === e.currentTarget) {
-                    console.log('🔴 Overlay clicked - closing');
                     onClose();
                 }
             }}
@@ -64,7 +73,7 @@ export default function MataKuliahFormModal({
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl mx-4"
                 onClick={(e) => e.stopPropagation()}
             >
-                <form onSubmit={onSubmit}>
+                <form onSubmit={handleSubmit(handleFormSubmit)}>
                     <div className="px-6 pt-6 pb-4">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -88,12 +97,11 @@ export default function MataKuliahFormModal({
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.kode_mk}
-                                    onChange={(e) => setFormData({ ...formData, kode_mk: e.target.value })}
+                                    {...register('kode_mk', { required: 'Kode mata kuliah wajib diisi' })}
                                     className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     placeholder="Contoh: TIF101"
-                                    required
                                 />
+                                {errors.kode_mk && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.kode_mk.message}</p>}
                             </div>
 
                             <div>
@@ -102,12 +110,11 @@ export default function MataKuliahFormModal({
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.nama_mk}
-                                    onChange={(e) => setFormData({ ...formData, nama_mk: e.target.value })}
+                                    {...register('nama_mk', { required: 'Nama mata kuliah wajib diisi' })}
                                     className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     placeholder="Contoh: Pemrograman Dasar"
-                                    required
                                 />
+                                {errors.nama_mk && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nama_mk.message}</p>}
                             </div>
 
                             <div>
@@ -116,34 +123,34 @@ export default function MataKuliahFormModal({
                                 </label>
                                 <input
                                     type="number"
-                                    min="1"
-                                    max="6"
-                                value={formData.sks}
-                                onChange={(e) => setFormData({ ...formData, sks: e.target.value })}
-                                className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder="1-6"
-                                required
-                            />
-                        </div>
+                                    {...register('sks', { 
+                                        required: 'SKS wajib diisi',
+                                        min: { value: 1, message: 'SKS minimal 1' },
+                                        max: { value: 6, message: 'SKS maksimal 6' }
+                                    })}
+                                    className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    placeholder="1-6"
+                                />
+                                {errors.sks && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.sks.message}</p>}
+                            </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                Program Studi <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                value={formData.prodi_id}
-                                onChange={(e) => setFormData({ ...formData, prodi_id: e.target.value })}
-                                className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                required
-                            >
-                                <option value="">Pilih Program Studi</option>
-                                {prodi.map((p) => (
-                                    <option key={p.id} value={p.id}>
-                                        {p.nama_prodi} - {p.fakultas.nama_fakultas}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                    Program Studi <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    {...register('prodi_id', { required: 'Program studi wajib dipilih' })}
+                                    className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="">Pilih Program Studi</option>
+                                    {prodi.map((p) => (
+                                        <option key={p.id} value={p.id}>
+                                            {p.nama_prodi} - {p.fakultas.nama_fakultas}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.prodi_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.prodi_id.message}</p>}
+                            </div>
                         </div>
 
                         <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">

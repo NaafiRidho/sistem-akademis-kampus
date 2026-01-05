@@ -1,3 +1,5 @@
+import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import LoadingButton from '../LoadingButton';
 
 interface Prodi {
@@ -30,9 +32,8 @@ interface MahasiswaFormData {
 interface MahasiswaFormModalProps {
     show: boolean;
     onClose: () => void;
-    onSubmit: (e: React.FormEvent) => void;
+    onSubmit: (data: MahasiswaFormData) => void;
     formData: MahasiswaFormData;
-    setFormData: (data: MahasiswaFormData) => void;
     prodis: Prodi[];
     kelas: Kelas[];
     isEdit?: boolean;
@@ -44,18 +45,38 @@ export default function MahasiswaFormModal({
     onClose, 
     onSubmit, 
     formData, 
-    setFormData, 
     prodis, 
     kelas, 
     isEdit = false, 
     loading = false 
 }: MahasiswaFormModalProps) {
+    const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<MahasiswaFormData>({
+        defaultValues: formData
+    });
+
+    useEffect(() => {
+        if (show) {
+            reset(formData);
+        }
+    }, [show, formData, reset]);
+
+    const prodiId = watch('prodi_id');
+    
+    // Filter kelas berdasarkan prodi yang dipilih
+    const filteredKelas = prodiId 
+        ? kelas?.filter((k: Kelas) => k.prodi_id === parseInt(prodiId))
+        : kelas;
+
+    // Reset kelas_id when prodi changes
+    useEffect(() => {
+        setValue('kelas_id', '');
+    }, [prodiId, setValue]);
+
     if (!show) return null;
 
-    // Filter kelas berdasarkan prodi yang dipilih
-    const filteredKelas = formData.prodi_id 
-        ? kelas?.filter((k: Kelas) => k.prodi_id === parseInt(formData.prodi_id))
-        : kelas;
+    const handleFormSubmit = (data: MahasiswaFormData) => {
+        onSubmit(data);
+    };
 
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start justify-center p-4">
@@ -63,34 +84,30 @@ export default function MahasiswaFormModal({
                 <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                     {isEdit ? 'Edit Data Mahasiswa' : 'Tambah Data Mahasiswa'}
                 </h3>
-                <form onSubmit={onSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">NIM *</label>
                             <input
                                 type="text"
-                                required
-                                value={formData.nim}
-                                onChange={(e) => setFormData({ ...formData, nim: e.target.value })}
+                                {...register('nim', { required: 'NIM wajib diisi' })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.nim && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nim.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama *</label>
                             <input
                                 type="text"
-                                required
-                                value={formData.nama}
-                                onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                                {...register('nama', { required: 'Nama wajib diisi' })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.nama && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nama.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prodi *</label>
                             <select
-                                required
-                                value={formData.prodi_id}
-                                onChange={(e) => setFormData({ ...formData, prodi_id: e.target.value, kelas_id: '' })}
+                                {...register('prodi_id', { required: 'Prodi wajib dipilih' })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             >
                                 <option value="">Pilih Prodi</option>
@@ -100,14 +117,14 @@ export default function MahasiswaFormModal({
                                     </option>
                                 ))}
                             </select>
+                            {errors.prodi_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.prodi_id.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kelas</label>
                             <select
-                                value={formData.kelas_id || ''}
-                                onChange={(e) => setFormData({ ...formData, kelas_id: e.target.value })}
+                                {...register('kelas_id')}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
-                                disabled={!formData.prodi_id}
+                                disabled={!prodiId}
                             >
                                 <option value="">Pilih Kelas</option>
                                 {filteredKelas?.map((k: Kelas) => (
@@ -121,33 +138,39 @@ export default function MahasiswaFormModal({
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Angkatan *</label>
                             <input
                                 type="number"
-                                required
-                                value={formData.angkatan}
-                                onChange={(e) => setFormData({ ...formData, angkatan: e.target.value })}
+                                {...register('angkatan', { 
+                                    required: 'Angkatan wajib diisi',
+                                    min: { value: 2000, message: 'Angkatan minimal 2000' }
+                                })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.angkatan && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.angkatan.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jenis Kelamin *</label>
                             <select
-                                required
-                                value={formData.jenis_kelamin}
-                                onChange={(e) => setFormData({ ...formData, jenis_kelamin: e.target.value })}
+                                {...register('jenis_kelamin', { required: 'Jenis kelamin wajib dipilih' })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             >
                                 <option value="L">Laki-laki</option>
                                 <option value="P">Perempuan</option>
                             </select>
+                            {errors.jenis_kelamin && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.jenis_kelamin.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
                             <input
                                 type="email"
-                                required
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                {...register('email', { 
+                                    required: 'Email wajib diisi',
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                        message: 'Format email tidak valid'
+                                    }
+                                })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -156,18 +179,19 @@ export default function MahasiswaFormModal({
                             </label>
                             <input
                                 type="password"
-                                required={!isEdit}
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                {...register('password', { 
+                                    required: !isEdit ? 'Password wajib diisi' : false,
+                                    minLength: { value: 6, message: 'Password minimal 6 karakter' }
+                                })}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
+                            {errors.password && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>}
                         </div>
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Alamat</label>
                             <textarea
                                 rows={3}
-                                value={formData.alamat}
-                                onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
+                                {...register('alamat')}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                             />
                         </div>

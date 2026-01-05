@@ -211,10 +211,9 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
         setShowEditModal(true);
     };
 
-    const handleSubmitCreate = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmitCreate = (data: typeof formData) => {
         setLoading(true);
-        router.post("/admin/mahasiswa", formData, {
+        router.post("/admin/mahasiswa", data, {
             onSuccess: () => {
                 setShowCreateModal(false);
                 setFormData(resetFormData());
@@ -229,13 +228,12 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
         });
     };
 
-    const handleSubmitEdit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmitEdit = (data: typeof formData) => {
         setLoading(true);
         router.post(
             `/admin/mahasiswa/${selectedMahasiswa?.id}`,
             {
-                ...formData,
+                ...data,
                 _method: "PUT",
             },
             {
@@ -563,7 +561,6 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
                 onClose={() => setShowCreateModal(false)}
                 onSubmit={handleSubmitCreate}
                 formData={formData}
-                setFormData={setFormData}
                 prodis={prodis}
                 kelas={kelas}
                 loading={loading}
@@ -575,7 +572,6 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
                 onClose={() => setShowEditModal(false)}
                 onSubmit={handleSubmitEdit}
                 formData={formData}
-                setFormData={setFormData}
                 prodis={prodis}
                 kelas={kelas}
                 loading={loading}

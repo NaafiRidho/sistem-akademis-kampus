@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useForm } from 'react-hook-form';
+
+interface FakultasFormData {
+    nama_fakultas: string;
+}
 
 interface FakultasFormModalProps {
     show: boolean;
     onClose: () => void;
     onSubmit: (e: React.FormEvent) => void;
-    formData: {
-        nama_fakultas: string;
-    };
+    formData: FakultasFormData;
     setFormData: (data: any) => void;
     isEdit: boolean;
 }
@@ -20,11 +23,23 @@ export default function FakultasFormModal({
     setFormData,
     isEdit
 }: FakultasFormModalProps) {
-    console.log('🚀 FakultasFormModal - show:', show);
-    
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<FakultasFormData>({
+        defaultValues: formData
+    });
+
+    useEffect(() => {
+        if (show) {
+            reset(formData);
+        }
+    }, [show, formData, reset]);
+
     if (!show) return null;
 
-    console.log('✅ Modal RENDERING via Portal');
+    const handleFormSubmit = (data: FakultasFormData) => {
+        Object.assign(formData, data);
+        setFormData(data);
+        onSubmit({ preventDefault: () => {} } as React.FormEvent);
+    };
 
     return createPortal(
         <div 
@@ -37,7 +52,6 @@ export default function FakultasFormModal({
             }}
             onClick={(e) => {
                 if (e.target === e.currentTarget) {
-                    console.log('🔴 Overlay clicked - closing');
                     onClose();
                 }
             }}
@@ -46,7 +60,7 @@ export default function FakultasFormModal({
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4"
                 onClick={(e) => e.stopPropagation()}
             >
-                <form onSubmit={onSubmit}>
+                <form onSubmit={handleSubmit(handleFormSubmit)}>
                     <div className="px-6 pt-6 pb-4">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -70,12 +84,11 @@ export default function FakultasFormModal({
                                     </label>
                                     <input
                                         type="text"
-                                        value={formData.nama_fakultas}
-                                        onChange={(e) => setFormData({ ...formData, nama_fakultas: e.target.value })}
+                                        {...register('nama_fakultas', { required: 'Nama fakultas wajib diisi' })}
                                         className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="Contoh: Fakultas Teknik"
-                                        required
                                     />
+                                    {errors.nama_fakultas && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nama_fakultas.message}</p>}
                                 </div>
                             </div>
                         </div>
