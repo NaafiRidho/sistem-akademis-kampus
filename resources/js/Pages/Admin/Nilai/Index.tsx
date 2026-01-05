@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import Sidebar from '@/Components/Layout/Sidebar';
 import Header from '@/Components/Layout/Header';
-import NilaiFormModal from '@/Components/Modals/NilaiFormModal';
-import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal';
-import ImportModal from '@/Components/Modals/ImportModal';
 import Toast from '@/Components/Toast';
 
 interface Nilai {
@@ -69,25 +66,11 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
         }
         return true;
     });
-    const [showModal, setShowModal] = useState(false);
-    const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-    const [selectedNilai, setSelectedNilai] = useState<Nilai | null>(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [showImportModal, setShowImportModal] = useState(false);
-    const [importFile, setImportFile] = useState<File | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterGrade, setFilterGrade] = useState('');
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error'>('success');
-
-    const [formData, setFormData] = useState({
-        mahasiswa_id: '',
-        mata_kuliah_id: '',
-        tugas: '',
-        uts: '',
-        uas: ''
-    });
 
     const showToastMessage = (message: string, type: 'success' | 'error') => {
         setToastMessage(message);
@@ -102,72 +85,6 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
     if (flash.error && !showToast) {
         showToastMessage(flash.error, 'error');
     }
-
-    const handleCreate = () => {
-        setModalMode('create');
-        setFormData({
-            mahasiswa_id: '',
-            mata_kuliah_id: '',
-            tugas: '',
-            uts: '',
-            uas: ''
-        });
-        setShowModal(true);
-    };
-
-    const handleEdit = (item: Nilai) => {
-        setModalMode('edit');
-        setSelectedNilai(item);
-        setFormData({
-            mahasiswa_id: item.mahasiswa_id.toString(),
-            mata_kuliah_id: item.mata_kuliah_id.toString(),
-            tugas: item.tugas.toString(),
-            uts: item.uts.toString(),
-            uas: item.uas.toString()
-        });
-        setShowModal(true);
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        if (modalMode === 'create') {
-            router.post('/admin/nilai', formData, {
-                onSuccess: () => setShowModal(false)
-            });
-        } else if (selectedNilai) {
-            router.put(`/admin/nilai/${selectedNilai.id}`, formData, {
-                onSuccess: () => setShowModal(false)
-            });
-        }
-    };
-
-    const handleDelete = (item: Nilai) => {
-        setSelectedNilai(item);
-        setShowDeleteModal(true);
-    };
-
-    const confirmDelete = () => {
-        if (selectedNilai) {
-            router.delete(`/admin/nilai/${selectedNilai.id}`, {
-                onSuccess: () => setShowDeleteModal(false)
-            });
-        }
-    };
-
-    const handleImport = () => {
-        if (importFile) {
-            const formData = new FormData();
-            formData.append('file', importFile);
-            
-            router.post('/admin/nilai/import', formData, {
-                onSuccess: () => {
-                    setShowImportModal(false);
-                    setImportFile(null);
-                }
-            });
-        }
-    };
 
     const filteredNilai = nilai.data.filter(item => {
         const matchSearch = item.mahasiswa.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -214,28 +131,6 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
                     />
 
                     <div className="space-y-6">
-                        {/* Action Buttons */}
-                        <div className="flex flex-wrap gap-3 justify-end">
-                            <button
-                                onClick={() => setShowImportModal(true)}
-                                className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200"
-                            >
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                </svg>
-                                Import Excel
-                            </button>
-                            <button
-                                onClick={handleCreate}
-                                className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
-                            >
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                Tambah Nilai
-                            </button>
-                        </div>
-
                         {/* Search & Filter */}
                         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
                             <div className="flex items-center mb-4">
@@ -286,7 +181,6 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
                                             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">UAS</th>
                                             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nilai Akhir</th>
                                             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Grade</th>
-                                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
@@ -325,33 +219,11 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
                                                             {item.grade}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                                        <div className="flex justify-center gap-2">
-                                                            <button
-                                                                onClick={() => handleEdit(item)}
-                                                                className="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded-lg shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200"
-                                                                title="Edit"
-                                                            >
-                                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                                </svg>
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDelete(item)}
-                                                                className="p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 rounded-lg shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200"
-                                                                title="Hapus"
-                                                            >
-                                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </td>
                                                 </tr>
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan={10} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                                <td colSpan={9} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                                     Tidak ada data nilai
                                                 </td>
                                             </tr>
@@ -363,41 +235,6 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
                     </div>
                 </div>
             </div>
-
-            {showModal && (
-                <NilaiFormModal
-                    show={showModal}
-                    onClose={() => setShowModal(false)}
-                    onSubmit={handleSubmit}
-                    formData={formData}
-                    setFormData={setFormData}
-                    mahasiswa={mahasiswa}
-                    mataKuliah={mataKuliah}
-                    isEdit={modalMode === 'edit'}
-                />
-            )}
-
-            <DeleteConfirmationModal
-                show={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
-                onConfirm={confirmDelete}
-                title="Hapus Nilai"
-                message={`Apakah Anda yakin ingin menghapus nilai untuk mata kuliah ${selectedNilai?.mata_kuliah.nama_mk}?`}
-                itemName={selectedNilai?.mahasiswa.nama || ''}
-            />
-
-            <ImportModal
-                show={showImportModal}
-                onClose={() => {
-                    setShowImportModal(false);
-                    setImportFile(null);
-                }}
-                onSubmit={handleImport}
-                file={importFile}
-                setFile={setImportFile}
-                templateUrl="/admin/nilai/template"
-                entityName="Nilai"
-            />
 
             {showToast && (
                 <Toast
