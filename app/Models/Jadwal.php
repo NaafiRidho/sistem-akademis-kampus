@@ -23,7 +23,7 @@ class Jadwal extends Model
 
     public function mataKuliah(): BelongsTo
     {
-        return $this->belongsTo(MataKuliah::class);
+        return $this->belongsTo(MataKuliah::class, 'mata_kuliah_id');
     }
 
     public function dosen(): BelongsTo

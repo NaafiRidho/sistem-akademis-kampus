@@ -6,6 +6,7 @@ import JadwalFormModal from '@/Components/Modals/JadwalFormModal';
 import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal';
 import ImportModal from '@/Components/Modals/ImportModal';
 import Toast from '@/Components/Toast';
+import LoadingBar from '@/Components/LoadingBar';
 
 interface Jadwal {
     id: number;
@@ -18,13 +19,9 @@ interface Jadwal {
     ruangan: string;
     kelas: {
         nama_kelas: string;
-        kode_kelas: string;
         prodi: { nama_prodi: string };
-        dosen: {
-            nama: string;
-        };
     };
-    mataKuliah: {
+    mata_kuliah: {
         kode_mk: string;
         nama_mk: string;
     };
@@ -36,10 +33,10 @@ interface Jadwal {
 interface Kelas {
     id: number;
     nama_kelas: string;
-    kode_kelas: string;
-    prodi: { nama_prodi: string };
-    dosen: {
-        nama: string;
+    prodi_id: number;
+    prodi: { 
+        id: number;
+        nama_prodi: string;
     };
 }
 
@@ -47,13 +44,22 @@ interface MataKuliah {
     id: number;
     kode_mk: string;
     nama_mk: string;
-    prodi: { nama_prodi: string };
+    prodi_id: number;
+    prodi: { 
+        id: number;
+        nama_prodi: string;
+    };
 }
 
 interface Dosen {
     id: number;
-    nip: string;
+    nidn: string;
     nama: string;
+    prodi_id?: number;
+    prodi?: {
+        id: number;
+        nama_prodi: string;
+    };
 }
 
 interface Props {
@@ -99,6 +105,7 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const [isLoading, setIsLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         kelas_id: '',
@@ -118,13 +125,14 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
         setShowToast(true);
     };
 
-    if (flash.success && !showToast) {
-        showToastMessage(flash.success, 'success');
-    }
-
-    if (flash.error && !showToast) {
-        showToastMessage(flash.error, 'error');
-    }
+    useEffect(() => {
+        if (flash.success) {
+            showToastMessage(flash.success, 'success');
+        }
+        if (flash.error) {
+            showToastMessage(flash.error, 'error');
+        }
+    }, [flash.success, flash.error]);
 
     const handleCreate = () => {
         setModalMode('create');
@@ -155,16 +163,28 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
         setShowModal(true);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        if (modalMode === 'create') {
-            router.post('/admin/jadwal', formData, {
-                onSuccess: () => setShowModal(false)
-            });
-        } else if (selectedJadwal) {
-            router.put(`/admin/jadwal/${selectedJadwal.id}`, formData, {
-                onSuccess: () => setShowModal(false)
+    const handleSubmitCreate = (data: typeof formData) => {
+        setIsLoading(true);
+        router.post('/admin/jadwal', data, {
+            onSuccess: () => {
+                setShowModal(false);
+                setIsLoading(false);
+            },
+            onError: () => setIsLoading(false),
+            onFinish: () => setIsLoading(false)
+        });
+    };
+
+    const handleSubmitEdit = (data: typeof formData) => {
+        if (selectedJadwal) {
+            setIsLoading(true);
+            router.put(`/admin/jadwal/${selectedJadwal.id}`, data, {
+                onSuccess: () => {
+                    setShowModal(false);
+                    setIsLoading(false);
+                },
+                onError: () => setIsLoading(false),
+                onFinish: () => setIsLoading(false)
             });
         }
     };
@@ -197,10 +217,10 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
     };
 
     const filteredJadwal = jadwal.data.filter(item => {
-        const matchSearch = item.mataKuliah.nama_mk.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           item.kelas.nama_kelas.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           item.dosen.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           item.ruangan.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchSearch = item.mata_kuliah?.nama_mk?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           item.kelas?.nama_kelas?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           item.dosen?.nama?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           item.ruangan?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchHari = filterHari === '' || item.hari === filterHari;
         return matchSearch && matchHari;
     });
@@ -322,15 +342,15 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
                                                         <div>
-                                                            <div className="font-medium">{item.mataKuliah.nama_mk}</div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-400">{item.mataKuliah.kode_mk}</div>
+                                                            <div className="font-medium">{item.mata_kuliah?.nama_mk || '-'}</div>
+                                                            <div className="text-xs text-gray-500 dark:text-gray-400">{item.mata_kuliah?.kode_mk || '-'}</div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                                        {item.kelas.dosen.nama}
+                                                        {item.dosen?.nama || '-'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                                        {item.kelas.kode_kelas}
+                                                        {item.kelas?.nama_kelas || '-'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                                         <div className="flex justify-center gap-2">
@@ -375,13 +395,13 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
                 <JadwalFormModal
                     show={showModal}
                     onClose={() => setShowModal(false)}
-                    onSubmit={handleSubmit}
-                    formData={formData}
-                    setFormData={setFormData}
+                    onSubmit={modalMode === 'create' ? handleSubmitCreate : handleSubmitEdit}
+                    formData={modalMode === 'edit' ? formData : undefined}
                     kelas={kelas}
                     mataKuliah={mataKuliah}
                     dosen={dosen}
                     isEdit={modalMode === 'edit'}
+                    isLoading={isLoading}
                 />
             )}
 
@@ -390,8 +410,8 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={confirmDelete}
                 title="Hapus Jadwal"
-                message={`Apakah Anda yakin ingin menghapus jadwal pada hari ${selectedJadwal?.hari}?`}
-                itemName={selectedJadwal?.mataKuliah.nama_mk || ''}
+                message={`Apakah Anda yakin ingin menghapus jadwal pada hari ${selectedJadwal?.hari || ''}?`}
+                itemName={selectedJadwal?.mata_kuliah?.nama_mk || ''}
             />
 
             <ImportModal
@@ -403,7 +423,7 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
                 onSubmit={handleImport}
                 file={importFile}
                 setFile={setImportFile}
-                templateUrl="/admin/jadwal/template"
+                templateUrl="/admin/jadwal/template/download"
                 entityName="Jadwal"
             />
 
@@ -414,6 +434,8 @@ export default function Index({ jadwal, kelas, mataKuliah, dosen, flash }: Props
                     onClose={() => setShowToast(false)}
                 />
             )}
+
+            <LoadingBar />
         </div>
     );
 }

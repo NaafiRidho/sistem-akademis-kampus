@@ -56,9 +56,9 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::resource('matakuliah', \App\Http\Controllers\Admin\MataKuliahController::class);
     
     // Jadwal CRUD
-    Route::resource('jadwal', \App\Http\Controllers\Admin\JadwalController::class);
     Route::post('jadwal/import', [\App\Http\Controllers\Admin\JadwalController::class, 'import'])->name('jadwal.import');
     Route::get('jadwal/template/download', [\App\Http\Controllers\Admin\JadwalController::class, 'downloadTemplate'])->name('jadwal.template');
+    Route::resource('jadwal', \App\Http\Controllers\Admin\JadwalController::class);
     
     // Nilai CRUD
     Route::resource('nilai', \App\Http\Controllers\Admin\NilaiController::class);
