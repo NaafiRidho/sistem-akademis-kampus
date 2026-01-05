@@ -15,7 +15,7 @@ class AbsensiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Absensi::with(['mahasiswa.prodi', 'jadwal.kelas.mataKuliah']);
+        $query = Absensi::with(['mahasiswa.prodi', 'jadwal.kelas', 'jadwal.mataKuliah']);
 
         // Search
         if ($request->has('search')) {
@@ -25,7 +25,7 @@ class AbsensiController extends Controller
                     $q->where('nama', 'like', "%{$search}%")
                       ->orWhere('nim', 'like', "%{$search}%");
                 })
-                ->orWhereHas('jadwal.kelas.mataKuliah', function($q) use ($search) {
+                ->orWhereHas('jadwal.mataKuliah', function($q) use ($search) {
                     $q->where('nama_mk', 'like', "%{$search}%");
                 });
             });
@@ -48,7 +48,7 @@ class AbsensiController extends Controller
 
         $absensi = $query->orderBy('tanggal', 'desc')->paginate(15);
         $mahasiswa = Mahasiswa::with('prodi')->get();
-        $jadwal = Jadwal::with(['kelas.mataKuliah'])->get();
+        $jadwal = Jadwal::with(['kelas', 'mataKuliah'])->get();
 
         return Inertia::render('Admin/Absensi/Index', [
             'absensi' => $absensi,
@@ -209,7 +209,7 @@ class AbsensiController extends Controller
                 SUM(CASE WHEN status = "Sakit" THEN 1 ELSE 0 END) as sakit,
                 SUM(CASE WHEN status = "Alpa" THEN 1 ELSE 0 END) as alpa
             ')
-            ->with(['jadwal.kelas.mataKuliah'])
+            ->with(['jadwal.kelas', 'jadwal.mataKuliah'])
             ->groupBy('jadwal_id')
             ->get();
 

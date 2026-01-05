@@ -61,9 +61,9 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::resource('jadwal', \App\Http\Controllers\Admin\JadwalController::class);
     
     // Nilai CRUD
-    Route::resource('nilai', \App\Http\Controllers\Admin\NilaiController::class);
     Route::post('nilai/import', [\App\Http\Controllers\Admin\NilaiController::class, 'import'])->name('nilai.import');
     Route::get('nilai/template/download', [\App\Http\Controllers\Admin\NilaiController::class, 'downloadTemplate'])->name('nilai.template');
+    Route::resource('nilai', \App\Http\Controllers\Admin\NilaiController::class);
     
     // Absensi CRUD
     Route::resource('absensi', \App\Http\Controllers\Admin\AbsensiController::class);

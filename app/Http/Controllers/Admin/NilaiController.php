@@ -60,9 +60,9 @@ class NilaiController extends Controller
             'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
             'semester' => 'required|integer|min:1|max:14',
             'tahun_ajaran' => 'required|string',
-            'nilai_tugas' => 'nullable|numeric|min:0|max:100',
-            'nilai_uts' => 'nullable|numeric|min:0|max:100',
-            'nilai_uas' => 'nullable|numeric|min:0|max:100',
+            'tugas' => 'nullable|numeric|min:0|max:100',
+            'uts' => 'nullable|numeric|min:0|max:100',
+            'uas' => 'nullable|numeric|min:0|max:100',
         ]);
 
         // Check if nilai already exists
@@ -77,9 +77,9 @@ class NilaiController extends Controller
         }
 
         // Calculate final grade
-        $nilaiTugas = $validated['nilai_tugas'] ?? 0;
-        $nilaiUts = $validated['nilai_uts'] ?? 0;
-        $nilaiUas = $validated['nilai_uas'] ?? 0;
+        $nilaiTugas = $validated['tugas'] ?? 0;
+        $nilaiUts = $validated['uts'] ?? 0;
+        $nilaiUas = $validated['uas'] ?? 0;
         
         $nilaiAkhir = ($nilaiTugas * 0.3) + ($nilaiUts * 0.3) + ($nilaiUas * 0.4);
         
@@ -105,15 +105,15 @@ class NilaiController extends Controller
             'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
             'semester' => 'required|integer|min:1|max:14',
             'tahun_ajaran' => 'required|string',
-            'nilai_tugas' => 'nullable|numeric|min:0|max:100',
-            'nilai_uts' => 'nullable|numeric|min:0|max:100',
-            'nilai_uas' => 'nullable|numeric|min:0|max:100',
+            'tugas' => 'nullable|numeric|min:0|max:100',
+            'uts' => 'nullable|numeric|min:0|max:100',
+            'uas' => 'nullable|numeric|min:0|max:100',
         ]);
 
         // Calculate final grade
-        $nilaiTugas = $validated['nilai_tugas'] ?? 0;
-        $nilaiUts = $validated['nilai_uts'] ?? 0;
-        $nilaiUas = $validated['nilai_uas'] ?? 0;
+        $nilaiTugas = $validated['tugas'] ?? 0;
+        $nilaiUts = $validated['uts'] ?? 0;
+        $nilaiUas = $validated['uas'] ?? 0;
         
         $nilaiAkhir = ($nilaiTugas * 0.3) + ($nilaiUts * 0.3) + ($nilaiUas * 0.4);
         
@@ -187,9 +187,9 @@ class NilaiController extends Controller
                         'mata_kuliah_id' => $mataKuliah->id,
                         'semester' => $row[2],
                         'tahun_ajaran' => $row[3],
-                        'nilai_tugas' => $nilaiTugas,
-                        'nilai_uts' => $nilaiUts,
-                        'nilai_uas' => $nilaiUas,
+                        'tugas' => $nilaiTugas,
+                        'uts' => $nilaiUts,
+                        'uas' => $nilaiUas,
                         'nilai_akhir' => round($nilaiAkhir, 2),
                         'grade' => $huruf
                     ]);

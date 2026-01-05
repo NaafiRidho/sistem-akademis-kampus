@@ -4,7 +4,6 @@ import Sidebar from '@/Components/Layout/Sidebar';
 import Header from '@/Components/Layout/Header';
 import AbsensiFormModal from '@/Components/Modals/AbsensiFormModal';
 import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal';
-import ImportModal from '@/Components/Modals/ImportModal';
 import Toast from '@/Components/Toast';
 
 interface Absensi {
@@ -23,8 +22,10 @@ interface Absensi {
         jam_mulai: string;
         jam_selesai: string;
         kelas: {
-            kode_kelas: string;
-            mata_kuliah: { nama_mk: string };
+            nama_kelas: string;
+        };
+        mata_kuliah: {
+            nama_mk: string;
         };
     };
 }
@@ -41,8 +42,10 @@ interface Jadwal {
     jam_mulai: string;
     jam_selesai: string;
     kelas: {
-        kode_kelas: string;
-        mata_kuliah: { nama_mk: string };
+        nama_kelas: string;
+    };
+    mata_kuliah: {
+        nama_mk: string;
     };
 }
 
@@ -78,11 +81,8 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
         return true;
     });
     const [showModal, setShowModal] = useState(false);
-    const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
     const [selectedAbsensi, setSelectedAbsensi] = useState<Absensi | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [showImportModal, setShowImportModal] = useState(false);
-    const [importFile, setImportFile] = useState<File | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('');
     const [showToast, setShowToast] = useState(false);
@@ -111,20 +111,7 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
         showToastMessage(flash.error, 'error');
     }
 
-    const handleCreate = () => {
-        setModalMode('create');
-        setFormData({
-            mahasiswa_id: '',
-            jadwal_id: '',
-            tanggal: new Date().toISOString().split('T')[0],
-            status: '',
-            keterangan: ''
-        });
-        setShowModal(true);
-    };
-
     const handleEdit = (item: Absensi) => {
-        setModalMode('edit');
         setSelectedAbsensi(item);
         setFormData({
             mahasiswa_id: item.mahasiswa_id.toString(),
@@ -139,11 +126,7 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (modalMode === 'create') {
-            router.post('/admin/absensi', formData, {
-                onSuccess: () => setShowModal(false)
-            });
-        } else if (selectedAbsensi) {
+        if (selectedAbsensi) {
             router.put(`/admin/absensi/${selectedAbsensi.id}`, formData, {
                 onSuccess: () => setShowModal(false)
             });
@@ -163,24 +146,10 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
         }
     };
 
-    const handleImport = () => {
-        if (importFile) {
-            const formData = new FormData();
-            formData.append('file', importFile);
-            
-            router.post('/admin/absensi/import', formData, {
-                onSuccess: () => {
-                    setShowImportModal(false);
-                    setImportFile(null);
-                }
-            });
-        }
-    };
-
     const filteredAbsensi = absensi.data.filter(item => {
         const matchSearch = item.mahasiswa.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            item.mahasiswa.nim.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           item.jadwal.kelas.mata_kuliah.nama_mk.toLowerCase().includes(searchTerm.toLowerCase());
+                           item.jadwal?.mata_kuliah?.nama_mk?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchStatus = filterStatus === '' || item.status === filterStatus;
         return matchSearch && matchStatus;
     });
@@ -231,28 +200,6 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                     />
 
                     <div className="space-y-6">
-                        {/* Action Buttons */}
-                        <div className="flex flex-wrap gap-3 justify-end">
-                            <button
-                                onClick={() => setShowImportModal(true)}
-                                className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200"
-                            >
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                </svg>
-                                Import Excel
-                            </button>
-                            <button
-                                onClick={handleCreate}
-                                className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
-                            >
-                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                Tambah Absensi
-                            </button>
-                        </div>
-
                         {/* Search & Filter */}
                         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
                             <div className="flex items-center mb-4">
@@ -325,7 +272,7 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                                        {item.jadwal.kelas.mata_kuliah.nama_mk}
+                                                        {item.jadwal?.mata_kuliah?.nama_mk || '-'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                                                         <div>
@@ -345,15 +292,17 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                                         <div className="flex justify-center gap-2">
-                                                            <button
-                                                                onClick={() => handleEdit(item)}
-                                                                className="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded-lg shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200"
-                                                                title="Edit"
-                                                            >
-                                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                                </svg>
-                                                            </button>
+                                                            {item.status !== 'Hadir' && (
+                                                                <button
+                                                                    onClick={() => handleEdit(item)}
+                                                                    className="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded-lg shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200"
+                                                                    title="Edit"
+                                                                >
+                                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                    </svg>
+                                                                </button>
+                                                            )}
                                                             <button
                                                                 onClick={() => handleDelete(item)}
                                                                 className="p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 rounded-lg shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200"
@@ -391,7 +340,7 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                     setFormData={setFormData}
                     mahasiswa={mahasiswa}
                     jadwal={jadwal}
-                    isEdit={modalMode === 'edit'}
+                    isEdit={true}
                 />
             )}
 
@@ -402,19 +351,6 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                 title="Hapus Absensi"
                 message={`Apakah Anda yakin ingin menghapus data absensi pada tanggal ${selectedAbsensi?.tanggal}?`}
                 itemName={selectedAbsensi?.mahasiswa.nama || ''}
-            />
-
-            <ImportModal
-                show={showImportModal}
-                onClose={() => {
-                    setShowImportModal(false);
-                    setImportFile(null);
-                }}
-                onSubmit={handleImport}
-                file={importFile}
-                setFile={setImportFile}
-                templateUrl="/admin/absensi/template"
-                entityName="Absensi"
             />
 
             {showToast && (

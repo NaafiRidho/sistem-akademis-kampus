@@ -8,7 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Nilai extends Model
 {
     protected $table = 'nilai';
-    protected $fillable = ['mahasiswa_id', 'mata_kuliah_id', 'tugas', 'uts', 'uas', 'nilai_akhir', 'grade'];
+    protected $fillable = [
+        'mahasiswa_id', 
+        'mata_kuliah_id', 
+        'semester', 
+        'tahun_ajaran',
+        'tugas', 
+        'uts', 
+        'uas', 
+        'nilai_akhir', 
+        'grade'
+    ];
 
     protected $casts = [
         'tugas' => 'decimal:2',
