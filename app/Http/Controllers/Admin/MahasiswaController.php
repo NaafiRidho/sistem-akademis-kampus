@@ -37,10 +37,17 @@ class MahasiswaController extends Controller
         $prodis = Prodi::with('fakultas')->get();
         $kelas = \App\Models\Kelas::with('prodi')->orderBy('nama_kelas')->get();
 
+        // Log untuk debugging di production (bisa dihapus setelah fix)
+        Log::info('Mahasiswa Controller - Data Count', [
+            'mahasiswa_count' => $mahasiswa->total(),
+            'prodis_count' => $prodis->count(),
+            'kelas_count' => $kelas->count()
+        ]);
+
         return Inertia::render('Admin/Mahasiswa/Index', [
             'mahasiswa' => $mahasiswa,
             'prodis' => $prodis,
-            'kelas' => $kelas,
+            'kelas' => $kelas ?? [], // Fallback ke array kosong
             'filters' => $request->only(['search', 'prodi_id'])
         ]);
     }

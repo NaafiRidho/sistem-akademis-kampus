@@ -61,11 +61,12 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
     const [showToast, setShowToast] = useState(false);
     const [toastConfig, setToastConfig] = useState({ type: 'info', message: '', details: [] });
     
-    console.log('=== FULL PAGE PROPS ===', props);
-    console.log('Props keys:', Object.keys(props));
-    console.log('Auth:', props.auth);
-    console.log('Flash:', props.flash);
-    console.log('Errors:', props.errors);
+    // Debug only in development
+    if (import.meta.env.DEV) {
+        console.log('=== FULL PAGE PROPS ===', props);
+        console.log('Kelas data:', kelas);
+        console.log('Prodis data:', prodis);
+    }
 
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== "undefined") {
@@ -112,10 +113,6 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
     }, [darkMode]);
 
     useEffect(() => {
-        console.log('=== Flash Effect Triggered ===');
-        console.log('Props in effect:', props);
-        console.log('Flash in effect:', props?.flash);
-        
         const flash = props?.flash;
         
         // Reset toast first
@@ -123,23 +120,19 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
         
         setTimeout(() => {
             if (flash?.success) {
-                console.log('Setting SUCCESS toast with message:', flash.success);
                 setToastConfig({
                     type: 'success',
                     message: flash.success,
                     details: flash.import_errors || []
                 });
                 setShowToast(true);
-                console.log('Toast state set to TRUE');
             } else if (flash?.error) {
-                console.log('Setting ERROR toast with message:', flash.error);
                 setToastConfig({
                     type: 'error',
                     message: flash.error,
                     details: flash.import_errors || []
                 });
                 setShowToast(true);
-                console.log('Toast state set to TRUE');
             }
         }, 100);
     }, [props]);

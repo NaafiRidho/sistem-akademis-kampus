@@ -62,10 +62,20 @@ export default function MahasiswaFormModal({
 
     const prodiId = watch('prodi_id');
     
+    // Debug: Log data yang diterima (hanya di development)
+    useEffect(() => {
+        if (import.meta.env.DEV && show) {
+            console.log('MahasiswaFormModal - Kelas Data:', kelas);
+            console.log('MahasiswaFormModal - Kelas Count:', kelas?.length || 0);
+            console.log('MahasiswaFormModal - Selected Prodi ID:', prodiId);
+        }
+    }, [show, kelas, prodiId]);
+    
     // Filter kelas berdasarkan prodi yang dipilih
+    // Tambahkan fallback untuk kasus kelas undefined atau null
     const filteredKelas = prodiId 
-        ? kelas?.filter((k: Kelas) => k.prodi_id === parseInt(prodiId))
-        : kelas;
+        ? (kelas || []).filter((k: Kelas) => k.prodi_id === parseInt(prodiId))
+        : (kelas || []);
 
     // Reset kelas_id when prodi changes
     useEffect(() => {
@@ -120,19 +130,33 @@ export default function MahasiswaFormModal({
                             {errors.prodi_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.prodi_id.message}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kelas</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Kelas
+                                {prodiId && filteredKelas && filteredKelas.length > 0 && (
+                                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                                        ({filteredKelas.length} kelas tersedia)
+                                    </span>
+                                )}
+                            </label>
                             <select
                                 {...register('kelas_id')}
                                 className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm"
                                 disabled={!prodiId}
                             >
-                                <option value="">Pilih Kelas</option>
+                                <option value="">
+                                    {!prodiId ? 'Pilih Prodi Terlebih Dahulu' : 'Pilih Kelas'}
+                                </option>
                                 {filteredKelas?.map((k: Kelas) => (
                                     <option key={k.id} value={k.id}>
                                         {k.nama_kelas} - Semester {k.semester}
                                     </option>
                                 ))}
                             </select>
+                            {prodiId && (!filteredKelas || filteredKelas.length === 0) && (
+                                <p className="mt-1 text-sm text-amber-600 dark:text-amber-400">
+                                    ⚠️ Tidak ada kelas untuk prodi ini
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Angkatan *</label>
