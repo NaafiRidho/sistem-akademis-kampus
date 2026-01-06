@@ -1,41 +1,48 @@
 {
-  "_DeleteConfirmationModal-CFXsr7Xv.js": {
-    "file": "assets/DeleteConfirmationModal-CFXsr7Xv.js",
+  "_DeleteConfirmationModal-LoH6LA-l.js": {
+    "file": "assets/DeleteConfirmationModal-LoH6LA-l.js",
     "name": "DeleteConfirmationModal",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Header-CU2FTHLz.js": {
-    "file": "assets/Header-CU2FTHLz.js",
+  "_Header-CGQiYpCt.js": {
+    "file": "assets/Header-CGQiYpCt.js",
     "name": "Header",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_ImportModal-UNbAOEJN.js": {
-    "file": "assets/ImportModal-UNbAOEJN.js",
+  "_ImportModal-CU3mRlja.js": {
+    "file": "assets/ImportModal-CU3mRlja.js",
     "name": "ImportModal",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_LoadingButton-B-_q9qcN.js": {
-    "file": "assets/LoadingButton-B-_q9qcN.js",
+  "_LoadingButton-D-k5dC3u.js": {
+    "file": "assets/LoadingButton-D-k5dC3u.js",
     "name": "LoadingButton",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Toast-BuKQV0x-.js": {
-    "file": "assets/Toast-BuKQV0x-.js",
+  "_Sidebar-BEbXwXvu.js": {
+    "file": "assets/Sidebar-BEbXwXvu.js",
+    "name": "Sidebar",
+    "imports": [
+      "resources/js/app.tsx"
+    ]
+  },
+  "_Toast-Dy97WA_D.js": {
+    "file": "assets/Toast-Dy97WA_D.js",
     "name": "Toast",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-ZdDN3m3B.css",
+    "file": "assets/app-BCoF-yRV.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -44,147 +51,156 @@
     ]
   },
   "resources/js/Pages/Admin/Absensi/Index.tsx": {
-    "file": "assets/Index-CyPV0lJD.js",
+    "file": "assets/Index-C23Irj3C.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Absensi/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js",
-      "_DeleteConfirmationModal-CFXsr7Xv.js",
-      "_Toast-BuKQV0x-.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js",
+      "_DeleteConfirmationModal-LoH6LA-l.js",
+      "_Toast-Dy97WA_D.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Admin/Dashboard.tsx": {
-    "file": "assets/Dashboard-BS36MPNC.js",
+    "file": "assets/Dashboard-SSELy4VZ.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Admin/Dashboard.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Admin/Dosen/Index.tsx": {
-    "file": "assets/Index-CIGVZCJF.js",
+    "file": "assets/Index-DwBHE4DB.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Dosen/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js",
-      "_ImportModal-UNbAOEJN.js",
-      "_DeleteConfirmationModal-CFXsr7Xv.js",
-      "_Toast-BuKQV0x-.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js",
+      "_ImportModal-CU3mRlja.js",
+      "_DeleteConfirmationModal-LoH6LA-l.js",
+      "_Toast-Dy97WA_D.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Admin/Fakultas/Index.tsx": {
-    "file": "assets/Index-CInW-rFw.js",
+    "file": "assets/Index-D_uyfmXn.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Fakultas/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js",
-      "_ImportModal-UNbAOEJN.js",
-      "_DeleteConfirmationModal-CFXsr7Xv.js",
-      "_Toast-BuKQV0x-.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js",
+      "_ImportModal-CU3mRlja.js",
+      "_DeleteConfirmationModal-LoH6LA-l.js",
+      "_Toast-Dy97WA_D.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Admin/Jadwal/Index.tsx": {
-    "file": "assets/Index-Cu8yA844.js",
+    "file": "assets/Index-CrA_EUT3.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Jadwal/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js",
-      "_ImportModal-UNbAOEJN.js",
-      "_LoadingButton-B-_q9qcN.js",
-      "_DeleteConfirmationModal-CFXsr7Xv.js",
-      "_Toast-BuKQV0x-.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js",
+      "_ImportModal-CU3mRlja.js",
+      "_LoadingButton-D-k5dC3u.js",
+      "_DeleteConfirmationModal-LoH6LA-l.js",
+      "_Toast-Dy97WA_D.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Admin/Mahasiswa/Index.tsx": {
-    "file": "assets/Index-BnJT8W_M.js",
+    "file": "assets/Index-DbeH25KR.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Mahasiswa/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js",
-      "_ImportModal-UNbAOEJN.js",
-      "_LoadingButton-B-_q9qcN.js",
-      "_DeleteConfirmationModal-CFXsr7Xv.js",
-      "_Toast-BuKQV0x-.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js",
+      "_ImportModal-CU3mRlja.js",
+      "_LoadingButton-D-k5dC3u.js",
+      "_DeleteConfirmationModal-LoH6LA-l.js",
+      "_Toast-Dy97WA_D.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Admin/MataKuliah/Index.tsx": {
-    "file": "assets/Index-C6o9ipe1.js",
+    "file": "assets/Index-DuD5Gl_I.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/MataKuliah/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js",
-      "_ImportModal-UNbAOEJN.js",
-      "_DeleteConfirmationModal-CFXsr7Xv.js",
-      "_Toast-BuKQV0x-.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js",
+      "_ImportModal-CU3mRlja.js",
+      "_DeleteConfirmationModal-LoH6LA-l.js",
+      "_Toast-Dy97WA_D.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Admin/Nilai/Index.tsx": {
-    "file": "assets/Index-HlNAhApg.js",
+    "file": "assets/Index-CFUbCHFN.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Nilai/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js",
-      "_Toast-BuKQV0x-.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js",
+      "_Toast-Dy97WA_D.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Admin/Prodi/Index.tsx": {
-    "file": "assets/Index-B3cmq-or.js",
+    "file": "assets/Index-BhWKA_pZ.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Prodi/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Header-CU2FTHLz.js",
-      "_ImportModal-UNbAOEJN.js",
-      "_DeleteConfirmationModal-CFXsr7Xv.js",
-      "_Toast-BuKQV0x-.js"
+      "_Sidebar-BEbXwXvu.js",
+      "_Header-CGQiYpCt.js",
+      "_ImportModal-CU3mRlja.js",
+      "_DeleteConfirmationModal-LoH6LA-l.js",
+      "_Toast-Dy97WA_D.js"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Auth/Login.tsx": {
-    "file": "assets/Login-lIYXXDKA.js",
+    "file": "assets/Login-CKwdz594.js",
     "name": "Login",
     "src": "resources/js/Pages/Auth/Login.tsx",
     "isDynamicEntry": true,
@@ -192,11 +208,24 @@
       "resources/js/app.tsx"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
+    ]
+  },
+  "resources/js/Pages/Dosen/Dashboard.tsx": {
+    "file": "assets/Dashboard-DGoHQhVT.js",
+    "name": "Dashboard",
+    "src": "resources/js/Pages/Dosen/Dashboard.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_Header-CGQiYpCt.js"
+    ],
+    "css": [
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/Pages/Welcome.tsx": {
-    "file": "assets/Welcome-Xn97QeGH.js",
+    "file": "assets/Welcome-Cj19eDNK.js",
     "name": "Welcome",
     "src": "resources/js/Pages/Welcome.tsx",
     "isDynamicEntry": true,
@@ -204,11 +233,11 @@
       "resources/js/app.tsx"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-BzlbgZyn.js",
+    "file": "assets/app-DRMUs7Ql.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -223,10 +252,11 @@
       "resources/js/Pages/Admin/Nilai/Index.tsx",
       "resources/js/Pages/Admin/Prodi/Index.tsx",
       "resources/js/Pages/Auth/Login.tsx",
+      "resources/js/Pages/Dosen/Dashboard.tsx",
       "resources/js/Pages/Welcome.tsx"
     ],
     "css": [
-      "assets/app-ZdDN3m3B.css"
+      "assets/app-BCoF-yRV.css"
     ]
   }
 }
