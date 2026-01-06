@@ -65,16 +65,26 @@ export default function MahasiswaFormModal({
     // Debug: Log data yang diterima (hanya di development)
     useEffect(() => {
         if (import.meta.env.DEV && show) {
-            console.log('MahasiswaFormModal - Kelas Data:', kelas);
-            console.log('MahasiswaFormModal - Kelas Count:', kelas?.length || 0);
-            console.log('MahasiswaFormModal - Selected Prodi ID:', prodiId);
+            console.log('=== MahasiswaFormModal Debug ===');
+            console.log('Kelas Data:', kelas);
+            console.log('Kelas Count:', kelas?.length || 0);
+            console.log('Selected Prodi ID (raw):', prodiId);
+            console.log('Selected Prodi ID (parsed):', parseInt(prodiId));
+            console.log('Prodi ID type:', typeof prodiId);
+            
+            if (prodiId && kelas) {
+                const filtered = kelas.filter((k: Kelas) => k.prodi_id === parseInt(prodiId));
+                console.log('Filtered Kelas Count:', filtered.length);
+                console.log('Sample Kelas prodi_id:', kelas[0]?.prodi_id, 'type:', typeof kelas[0]?.prodi_id);
+            }
         }
     }, [show, kelas, prodiId]);
     
     // Filter kelas berdasarkan prodi yang dipilih
     // Tambahkan fallback untuk kasus kelas undefined atau null
+    // Gunakan == untuk loose comparison agar bisa handle string vs number
     const filteredKelas = prodiId 
-        ? (kelas || []).filter((k: Kelas) => k.prodi_id === parseInt(prodiId))
+        ? (kelas || []).filter((k: Kelas) => k.prodi_id == parseInt(prodiId) || k.prodi_id === parseInt(prodiId))
         : (kelas || []);
 
     // Reset kelas_id when prodi changes

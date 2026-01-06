@@ -41,7 +41,13 @@ class MahasiswaController extends Controller
         Log::info('Mahasiswa Controller - Data Count', [
             'mahasiswa_count' => $mahasiswa->total(),
             'prodis_count' => $prodis->count(),
-            'kelas_count' => $kelas->count()
+            'kelas_count' => $kelas->count(),
+            'kelas_sample' => $kelas->take(3)->map(fn($k) => [
+                'id' => $k->id,
+                'nama' => $k->nama_kelas,
+                'prodi_id' => $k->prodi_id,
+                'prodi_id_type' => gettype($k->prodi_id)
+            ])
         ]);
 
         return Inertia::render('Admin/Mahasiswa/Index', [
