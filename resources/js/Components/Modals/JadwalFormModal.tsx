@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import LoadingButton from '@/Components/LoadingButton';
@@ -110,6 +110,35 @@ export default function JadwalFormModal({
         }
     }, [show, formData, reset]);
 
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        if (show) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [show]);
+
+    // Handle Escape key to close modal
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && show && !isLoading) {
+                onClose();
+            }
+        };
+        
+        if (show) {
+            document.addEventListener('keydown', handleEscape);
+        }
+        
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [show, onClose, isLoading]);
+
     // Reset mata_kuliah_id dan dosen_id ketika kelas berubah
     useEffect(() => {
         if (kelasId && selectedKelas) {
@@ -130,48 +159,74 @@ export default function JadwalFormModal({
     }, [kelasId, selectedKelas, filteredMataKuliah, filteredDosen]);
 
     const handleFormSubmit = (data: JadwalFormData) => {
+        // Validate that jam_selesai is after jam_mulai
+        if (data.jam_mulai && data.jam_selesai) {
+            const [startHour, startMin] = data.jam_mulai.split(':').map(Number);
+            const [endHour, endMin] = data.jam_selesai.split(':').map(Number);
+            
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            
+            if (endMinutes <= startMinutes) {
+                alert('Jam selesai harus lebih dari jam mulai');
+                return;
+            }
+        }
+        
         onSubmit(data);
     };
 
     if (!show) return null;
 
     return createPortal(
-        <div 
-            className="fixed inset-0 z-[9999] overflow-y-auto"
-            style={{ 
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}
-            onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                    onClose();
+        <>
+            <style>{`
+                .modal-no-scrollbar::-webkit-scrollbar {
+                    display: none;
                 }
-            }}
-        >
+            `}</style>
             <div 
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl mx-4"
+                className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                style={{ 
+                    backgroundColor: 'rgba(0,0,0,0.8)'
+                }}
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                        onClose();
+                    }
+                }}
+            >
+                <div 
+                    className="modal-no-scrollbar bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
+                style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitOverflowScrolling: 'touch'
+                } as React.CSSProperties & { WebkitOverflowScrolling?: string }}
             >
                 <form onSubmit={handleSubmit(handleFormSubmit)}>
-                    <div className="px-6 pt-6 pb-4">
-                        <div className="flex items-center justify-between mb-4">
+                    <div className="sticky top-0 bg-white dark:bg-gray-800 px-6 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700 z-10">
+                        <div className="flex items-center justify-between">
                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
                                 {isEdit ? 'Edit Jadwal Kuliah' : 'Tambah Jadwal Kuliah'}
                             </h3>
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                disabled={isLoading}
+                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 transition-colors"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
+                    </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="px-6 py-4">
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Kelas <span className="text-red-500">*</span>
@@ -326,25 +381,28 @@ export default function JadwalFormModal({
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 sm:flex sm:flex-row-reverse gap-3">
-                        <LoadingButton
-                            type="submit"
-                            loading={isLoading}
-                            className="w-full sm:w-auto px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200"
-                        >
-                            {isEdit ? 'Update' : 'Simpan'}
-                        </LoadingButton>
+                    <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-600 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="mt-3 sm:mt-0 w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-base font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            disabled={isLoading}
+                            className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-base font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                             Batal
                         </button>
+                        <LoadingButton
+                            type="submit"
+                            loading={isLoading}
+                            disabled={isLoading}
+                            className="w-full sm:w-auto px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200"
+                        >
+                            {isEdit ? 'Update' : 'Simpan'}
+                        </LoadingButton>
                     </div>
                 </form>
             </div>
-        </div>,
+        </div>
+        </>,
         document.body
     );
 }

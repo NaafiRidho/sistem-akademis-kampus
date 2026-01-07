@@ -6,6 +6,7 @@ import MahasiswaFormModal from "@/Components/Modals/MahasiswaFormModal";
 import DeleteConfirmationModal from "@/Components/Modals/DeleteConfirmationModal";
 import ImportModal from "@/Components/Modals/ImportModal";
 import Toast from "@/Components/Toast";
+import LoadingBar from "@/Components/LoadingBar";
 
 interface Mahasiswa {
     id: number;
@@ -275,6 +276,8 @@ export default function MahasiswaIndex({ mahasiswa, prodis, kelas, filters }: Pa
         <div className={darkMode ? "dark" : ""}>
             <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
                 <Head title="Data Mahasiswa" />
+                
+                <LoadingBar />
 
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeMenu="mahasiswa" />
 

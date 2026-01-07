@@ -6,6 +6,7 @@ import DosenFormModal from '@/Components/Modals/DosenFormModal';
 import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal';
 import ImportModal from '@/Components/Modals/ImportModal';
 import Toast from '@/Components/Toast';
+import LoadingBar from '@/Components/LoadingBar';
 
 interface Dosen {
     id: number;
@@ -80,6 +81,7 @@ export default function DosenIndex({ dosen, prodis, filters }: PageProps) {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedDosen, setSelectedDosen] = useState<Dosen | null>(null);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         nidn: '',
         nama: '',
@@ -189,16 +191,21 @@ export default function DosenIndex({ dosen, prodis, filters }: PageProps) {
 
     const handleSubmitCreate = (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         router.post('/admin/dosen', formData, {
             onSuccess: () => {
                 setShowCreateModal(false);
                 setFormData(resetFormData());
-            }
+                setLoading(false);
+            },
+            onError: () => setLoading(false),
+            onFinish: () => setLoading(false)
         });
     };
 
     const handleSubmitEdit = (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         router.post(`/admin/dosen/${selectedDosen?.id}`, {
             ...formData,
             _method: 'PUT'
@@ -206,7 +213,10 @@ export default function DosenIndex({ dosen, prodis, filters }: PageProps) {
             onSuccess: () => {
                 setShowEditModal(false);
                 setSelectedDosen(null);
-            }
+                setLoading(false);
+            },
+            onError: () => setLoading(false),
+            onFinish: () => setLoading(false)
         });
     };
 
@@ -246,6 +256,8 @@ export default function DosenIndex({ dosen, prodis, filters }: PageProps) {
         <div className={darkMode ? 'dark' : ''}>
             <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
                 <Head title="Data Dosen" />
+                
+                <LoadingBar />
 
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeMenu="dosen" />
 
@@ -454,9 +466,9 @@ export default function DosenIndex({ dosen, prodis, filters }: PageProps) {
                 onClose={() => setShowCreateModal(false)}
                 onSubmit={handleSubmitCreate}
                 formData={formData}
-                setFormData={setFormData}
                 prodis={prodis}
                 isEdit={false}
+                loading={loading}
             />
 
             <DosenFormModal
@@ -464,9 +476,9 @@ export default function DosenIndex({ dosen, prodis, filters }: PageProps) {
                 onClose={() => setShowEditModal(false)}
                 onSubmit={handleSubmitEdit}
                 formData={formData}
-                setFormData={setFormData}
                 prodis={prodis}
                 isEdit={true}
+                loading={loading}
             />
 
             <DeleteConfirmationModal
