@@ -27,10 +27,10 @@ class DashboardController extends Controller
 
         // Statistik Absensi
         $absensi_stats = [
-            'hadir' => Absensi::where('status', 'hadir')->count(),
-            'sakit' => Absensi::where('status', 'sakit')->count(),
-            'izin' => Absensi::where('status', 'izin')->count(),
-            'alpha' => Absensi::where('status', 'alpha')->count(),
+            'hadir' => Absensi::where('status', 'Hadir')->count(),
+            'sakit' => Absensi::where('status', 'Sakit')->count(),
+            'izin' => Absensi::where('status', 'Izin')->count(),
+            'alpha' => Absensi::where('status', 'Alpa')->count(),
         ];
 
         // Grafik Nilai - Distribusi nilai mahasiswa
