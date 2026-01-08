@@ -243,84 +243,85 @@ export default function Dashboard({ stats, absensi_stats, grafik_nilai }: Dashbo
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Distribusi Nilai Mahasiswa</h2>
                             <div className="space-y-3">
-                                {(() => {
-                                    const total = (grafik_nilai?.A || 0) + (grafik_nilai?.B || 0) + (grafik_nilai?.C || 0) + (grafik_nilai?.D || 0) + (grafik_nilai?.E || 0);
-                                    const getPercentage = (value: number) => total > 0 ? Math.round((value / total) * 100) : 0;
-                                    
-                                    return (
-                                        <>
-                                            {/* Grade A */}
-                                            <div>
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade A (85-100)</span>
-                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.A || 0}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                                                    <div 
-                                                        className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500" 
-                                                        style={{ width: `${getPercentage(grafik_nilai?.A || 0)}%`, minWidth: (grafik_nilai?.A || 0) > 0 ? '2%' : '0%' }}
-                                                    ></div>
-                                                </div>
-                                            </div>
+                                {/* Grade A */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade A (85-100)</span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.A || 0}</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                        <div 
+                                            className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-300" 
+                                            style={{ 
+                                                width: grafik_nilai?.A ? `${Math.max((grafik_nilai.A / ((grafik_nilai?.A || 0) + (grafik_nilai?.B || 0) + (grafik_nilai?.C || 0) + (grafik_nilai?.D || 0) + (grafik_nilai?.E || 0))) * 100, 2)}%` : '0%'
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
 
-                                            {/* Grade B */}
-                                            <div>
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade B (70-84)</span>
-                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.B || 0}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                                                    <div 
-                                                        className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500" 
-                                                        style={{ width: `${getPercentage(grafik_nilai?.B || 0)}%`, minWidth: (grafik_nilai?.B || 0) > 0 ? '2%' : '0%' }}
-                                                    ></div>
-                                                </div>
-                                            </div>
+                                {/* Grade B */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade B (70-84)</span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.B || 0}</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                        <div 
+                                            className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300" 
+                                            style={{ 
+                                                width: grafik_nilai?.B ? `${Math.max((grafik_nilai.B / ((grafik_nilai?.A || 0) + (grafik_nilai?.B || 0) + (grafik_nilai?.C || 0) + (grafik_nilai?.D || 0) + (grafik_nilai?.E || 0))) * 100, 2)}%` : '0%'
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
 
-                                            {/* Grade C */}
-                                            <div>
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade C (60-69)</span>
-                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.C || 0}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                                                    <div 
-                                                        className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full transition-all duration-500" 
-                                                        style={{ width: `${getPercentage(grafik_nilai?.C || 0)}%`, minWidth: (grafik_nilai?.C || 0) > 0 ? '2%' : '0%' }}
-                                                    ></div>
-                                                </div>
-                                            </div>
+                                {/* Grade C */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade C (60-69)</span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.C || 0}</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                        <div 
+                                            className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full transition-all duration-300" 
+                                            style={{ 
+                                                width: grafik_nilai?.C ? `${Math.max((grafik_nilai.C / ((grafik_nilai?.A || 0) + (grafik_nilai?.B || 0) + (grafik_nilai?.C || 0) + (grafik_nilai?.D || 0) + (grafik_nilai?.E || 0))) * 100, 2)}%` : '0%'
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
 
-                                            {/* Grade D */}
-                                            <div>
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade D (50-59)</span>
-                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.D || 0}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                                                    <div 
-                                                        className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full transition-all duration-500" 
-                                                        style={{ width: `${getPercentage(grafik_nilai?.D || 0)}%`, minWidth: (grafik_nilai?.D || 0) > 0 ? '2%' : '0%' }}
-                                                    ></div>
-                                                </div>
-                                            </div>
+                                {/* Grade D */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade D (50-59)</span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.D || 0}</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                        <div 
+                                            className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full transition-all duration-300" 
+                                            style={{ 
+                                                width: grafik_nilai?.D ? `${Math.max((grafik_nilai.D / ((grafik_nilai?.A || 0) + (grafik_nilai?.B || 0) + (grafik_nilai?.C || 0) + (grafik_nilai?.D || 0) + (grafik_nilai?.E || 0))) * 100, 2)}%` : '0%'
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
 
-                                            {/* Grade E */}
-                                            <div>
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade E (&lt;50)</span>
-                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.E || 0}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                                                    <div 
-                                                        className="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-500" 
-                                                        style={{ width: `${getPercentage(grafik_nilai?.E || 0)}%`, minWidth: (grafik_nilai?.E || 0) > 0 ? '2%' : '0%' }}
-                                                    ></div>
-                                                </div>
-                                            </div>
-                                        </>
-                                    );
-                                })()}
+                                {/* Grade E */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grade E (&lt;50)</span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{grafik_nilai?.E || 0}</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                        <div 
+                                            className="bg-gradient-to-r from-red-500 to-red-600 h-3 rounded-full transition-all duration-300" 
+                                            style={{ 
+                                                width: grafik_nilai?.E ? `${Math.max((grafik_nilai.E / ((grafik_nilai?.A || 0) + (grafik_nilai?.B || 0) + (grafik_nilai?.C || 0) + (grafik_nilai?.D || 0) + (grafik_nilai?.E || 0))) * 100, 2)}%` : '0%'
+                                            }}
+                                        ></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
