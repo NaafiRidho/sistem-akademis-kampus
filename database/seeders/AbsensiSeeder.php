@@ -7,11 +7,13 @@ use App\Models\Absensi;
 use App\Models\Jadwal;
 use App\Models\Mahasiswa;
 use Carbon\Carbon;
+use Faker\Factory as Faker;
 
 class AbsensiSeeder extends Seeder
 {
     public function run(): void
     {
+        $faker = Faker::create('id_ID');
         $jadwal = Jadwal::with('kelas')->get();
         $statusList = ['Hadir', 'Sakit', 'Izin', 'Alpa'];
         
@@ -47,11 +49,11 @@ class AbsensiSeeder extends Seeder
                     // Generate keterangan untuk status selain Hadir
                     $keterangan = null;
                     if ($status === 'Sakit') {
-                        $keterangan = fake()->randomElement(['Demam', 'Flu', 'Sakit kepala', 'Sakit perut', 'Batuk pilek']);
+                        $keterangan = $faker->randomElement(['Demam', 'Flu', 'Sakit kepala', 'Sakit perut', 'Batuk pilek']);
                     } elseif ($status === 'Izin') {
-                        $keterangan = fake()->randomElement(['Keperluan keluarga', 'Acara penting', 'Urusan pribadi', 'Acara keluarga']);
+                        $keterangan = $faker->randomElement(['Keperluan keluarga', 'Acara penting', 'Urusan pribadi', 'Acara keluarga']);
                     } elseif ($status === 'Alpa') {
-                        $keterangan = rand(0, 1) ? fake()->randomElement(['Terlambat bangun', 'Lupa jadwal', 'Kendaraan rusak']) : null;
+                        $keterangan = rand(0, 1) ? $faker->randomElement(['Terlambat bangun', 'Lupa jadwal', 'Kendaraan rusak']) : null;
                     }
                     
                     Absensi::create([
