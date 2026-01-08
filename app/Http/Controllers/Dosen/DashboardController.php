@@ -44,9 +44,30 @@ class DashboardController extends Controller
         $hariIni = now()->locale('id')->dayName;
         $jadwalHariIni = Jadwal::where('dosen_id', $dosen->id)
             ->where('hari', $hariIni)
-            ->with(['mataKuliah', 'kelas', 'ruangan'])
+            ->with(['mataKuliah', 'kelas'])
             ->orderBy('jam_mulai')
             ->get();
+
+        // Transform jadwal untuk frontend
+        $jadwalTransformed = $jadwalHariIni->map(function($item) {
+            return [
+                'id' => $item->id,
+                'hari' => $item->hari,
+                'jam_mulai' => date('H:i', strtotime($item->jam_mulai)),
+                'jam_selesai' => date('H:i', strtotime($item->jam_selesai)),
+                'ruangan' => $item->ruangan,
+                'mata_kuliah' => [
+                    'id' => $item->mataKuliah->id,
+                    'nama' => $item->mataKuliah->nama_mk,
+                    'kode' => $item->mataKuliah->kode_mk,
+                    'sks' => $item->mataKuliah->sks,
+                ],
+                'kelas' => [
+                    'id' => $item->kelas->id,
+                    'nama_kelas' => $item->kelas->nama_kelas,
+                ],
+            ];
+        });
 
         // Get recent activities
         $recentNilai = Nilai::whereHas('mataKuliah.jadwal', function($q) use ($dosen) {
@@ -55,7 +76,24 @@ class DashboardController extends Controller
             ->with(['mahasiswa', 'mataKuliah'])
             ->latest()
             ->take(5)
-            ->get();
+            ->get()
+            ->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'nilai' => $item->nilai,
+                    'grade' => $item->grade,
+                    'mahasiswa' => [
+                        'id' => $item->mahasiswa->id,
+                        'nim' => $item->mahasiswa->nim,
+                        'nama' => $item->mahasiswa->nama,
+                    ],
+                    'mata_kuliah' => [
+                        'id' => $item->mataKuliah->id,
+                        'nama' => $item->mataKuliah->nama_mk,
+                        'kode' => $item->mataKuliah->kode_mk,
+                    ],
+                ];
+            });
 
         return Inertia::render('Dosen/Dashboard', [
             'dosen' => $dosen,
@@ -63,9 +101,9 @@ class DashboardController extends Controller
                 'total_mata_kuliah' => $totalMataKuliah,
                 'total_kelas' => $totalKelas,
                 'total_mahasiswa' => $totalMahasiswa,
-                'jadwal_hari_ini' => $jadwalHariIni->count(),
+                'jadwal_hari_ini' => $jadwalTransformed->count(),
             ],
-            'jadwal_hari_ini' => $jadwalHariIni,
+            'jadwal_hari_ini' => $jadwalTransformed,
             'recent_nilai' => $recentNilai,
             'hari' => $hariIni,
         ]);

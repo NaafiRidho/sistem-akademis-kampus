@@ -1,0 +1,1 @@
+function r(d,e,n){let s={"dosen.jadwal.index":"/dosen/jadwal","dosen.kelas.index":"/dosen/kelas","dosen.kelas.mahasiswa":"/dosen/kelas/:id/mahasiswa","dosen.dashboard":"/dosen/dashboard"}[d]||"/";return e&&(typeof e=="object"&&!Array.isArray(e)?Object.keys(e).forEach(o=>{s=s.replace(`:${o}`,String(e[o]))}):s=s.replace(":id",String(e))),s}export{r};

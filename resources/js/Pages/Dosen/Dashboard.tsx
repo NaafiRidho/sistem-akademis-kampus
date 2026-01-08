@@ -29,15 +29,13 @@ interface Props {
             id: number;
             nama: string;
             kode: string;
+            sks: number;
         };
         kelas: {
             id: number;
-            nama: string;
+            nama_kelas: string;
         };
-        ruangan: {
-            id: number;
-            nama: string;
-        } | null;
+        ruangan: string;
     }>;
     recent_nilai: Array<{
         id: number;
@@ -191,25 +189,31 @@ export default function Dashboard({ dosen, stats, jadwal_hari_ini, recent_nilai,
                                             >
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div className="flex-1">
-                                                        <h3 className="font-semibold text-gray-800 dark:text-white">
+                                                        <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
                                                             {jadwal.mata_kuliah.nama}
                                                         </h3>
-                                                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                            {jadwal.mata_kuliah.kode} • Kelas {jadwal.kelas.nama}
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                                                            {jadwal.mata_kuliah.kode} • {jadwal.mata_kuliah.sks} SKS
                                                         </p>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                                </svg>
+                                                                {jadwal.kelas.nama_kelas}
+                                                            </span>
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"></path>
+                                                                </svg>
+                                                                {jadwal.ruangan}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                     <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-full whitespace-nowrap ml-2">
                                                         {jadwal.jam_mulai} - {jadwal.jam_selesai}
                                                     </span>
                                                 </div>
-                                                {jadwal.ruangan && (
-                                                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                                                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"></path>
-                                                        </svg>
-                                                        {jadwal.ruangan.nama}
-                                                    </div>
-                                                )}
                                             </div>
                                         ))}
                                     </div>
