@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Absensi extends Model
 {
     protected $table = 'absensi';
-    protected $fillable = ['jadwal_id', 'mahasiswa_id', 'tanggal', 'status'];
+    protected $fillable = ['jadwal_id', 'mahasiswa_id', 'tanggal', 'status', 'keterangan'];
 
     protected $casts = [
         'tanggal' => 'date',

@@ -10,6 +10,13 @@ class Fakultas extends Model
 {
     protected $table = 'fakultas';
     protected $fillable = ['nama_fakultas'];
+    
+    protected $appends = ['nama'];
+
+    public function getNamaAttribute()
+    {
+        return $this->nama_fakultas;
+    }
 
     public function prodi(): HasMany
     {

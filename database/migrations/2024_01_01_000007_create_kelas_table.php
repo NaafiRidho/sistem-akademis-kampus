@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->string('nama_kelas');
             $table->foreignId('prodi_id')->constrained('prodi')->onDelete('cascade');
-            $table->integer('semester');
+            $table->string('semester', 20); // Ganjil atau Genap
+            $table->string('tahun_ajaran', 20); // e.g., 2024/2025
             $table->timestamps();
         });
     }

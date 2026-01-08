@@ -44,7 +44,8 @@ class KelasSeeder extends Seeder
                     $kelasData[] = [
                         'nama_kelas' => "{$inisial}-{$semester}{$hurufKelas}",
                         'prodi_id' => $prodi->id,
-                        'semester' => $semester,
+                        'semester' => $semester % 2 == 1 ? 'Ganjil' : 'Genap',
+                        'tahun_ajaran' => '2024/2025',
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

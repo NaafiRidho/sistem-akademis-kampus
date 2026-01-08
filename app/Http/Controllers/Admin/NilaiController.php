@@ -15,9 +15,10 @@ class NilaiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Nilai::with(['mahasiswa.prodi', 'mataKuliah']);
+        try {
+            $query = Nilai::with(['mahasiswa.prodi', 'mataKuliah']);
 
-        // Search
+            // Search
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -31,6 +32,20 @@ class NilaiController extends Controller
             });
         }
 
+        // Filter by prodi
+        if ($request->has('prodi_id') && $request->prodi_id) {
+            $query->whereHas('mahasiswa', function($q) use ($request) {
+                $q->where('prodi_id', $request->prodi_id);
+            });
+        }
+
+        // Filter by kelas
+        if ($request->has('kelas_id') && $request->kelas_id) {
+            $query->whereHas('mahasiswa', function($q) use ($request) {
+                $q->where('kelas_id', $request->kelas_id);
+            });
+        }
+
         // Filter by mahasiswa
         if ($request->has('mahasiswa_id') && $request->mahasiswa_id) {
             $query->where('mahasiswa_id', $request->mahasiswa_id);
@@ -41,16 +56,97 @@ class NilaiController extends Controller
             $query->where('mata_kuliah_id', $request->mata_kuliah_id);
         }
 
-        $nilai = $query->orderBy('created_at', 'desc')->paginate(15);
-        $mahasiswa = Mahasiswa::with('prodi')->get();
-        $mataKuliah = MataKuliah::all();
+        $perPage = $request->input('per_page', 15);
+        $nilai = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        
+        // Transform data untuk frontend
+        $nilai->getCollection()->transform(function($item) {
+            return [
+                'id' => $item->id,
+                'mahasiswa' => [
+                    'id' => $item->mahasiswa->id,
+                    'nim' => $item->mahasiswa->nim,
+                    'nama' => $item->mahasiswa->nama,
+                    'prodi' => [
+                        'id' => $item->mahasiswa->prodi->id,
+                        'nama_prodi' => $item->mahasiswa->prodi->nama_prodi,
+                    ],
+                ],
+                'mata_kuliah' => [
+                    'id' => $item->mataKuliah->id,
+                    'nama' => $item->mataKuliah->nama_mk,
+                    'kode' => $item->mataKuliah->kode_mk,
+                    'sks' => $item->mataKuliah->sks,
+                ],
+                'semester' => $item->semester,
+                'tahun_ajaran' => $item->tahun_ajaran,
+                'tugas' => $item->tugas,
+                'uts' => $item->uts,
+                'uas' => $item->uas,
+                'nilai_akhir' => $item->nilai_akhir,
+                'grade' => $item->grade,
+                'created_at' => $item->created_at,
+            ];
+        });
+        
+        // Transform mahasiswa data
+        $mahasiswa = Mahasiswa::with('prodi')->get()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'nim' => $item->nim,
+                'nama' => $item->nama,
+                'prodi' => [
+                    'id' => $item->prodi->id,
+                    'nama_prodi' => $item->prodi->nama_prodi,
+                ],
+            ];
+        });
+        
+        // Transform mata kuliah data
+        $mataKuliah = MataKuliah::all()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'nama' => $item->nama_mk,
+                'kode' => $item->kode_mk,
+                'sks' => $item->sks,
+            ];
+        });
 
-        return Inertia::render('Admin/Nilai/Index', [
-            'nilai' => $nilai,
-            'mahasiswa' => $mahasiswa,
-            'mataKuliah' => $mataKuliah,
-            'filters' => $request->only(['search', 'mahasiswa_id', 'mata_kuliah_id'])
-        ]);
+        // Get prodi and kelas for filters
+        $prodi = \App\Models\Prodi::all()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'nama_prodi' => $item->nama_prodi,
+            ];
+        });
+
+        $kelas = \App\Models\Kelas::with('prodi')->get()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'nama_kelas' => $item->nama_kelas,
+                'prodi_id' => $item->prodi_id,
+                'prodi_nama' => $item->prodi->nama_prodi,
+            ];
+        });
+
+            return Inertia::render('Admin/Nilai/Index', [
+                'nilai' => $nilai,
+                'mahasiswa' => $mahasiswa,
+                'mataKuliah' => $mataKuliah,
+                'prodi' => $prodi,
+                'kelas' => $kelas,
+                'filters' => $request->only(['search', 'mahasiswa_id', 'mata_kuliah_id', 'prodi_id', 'kelas_id', 'per_page'])
+            ]);
+        } catch (\Exception $e) {
+            return Inertia::render('Admin/Nilai/Index', [
+                'nilai' => ['data' => [], 'current_page' => 1, 'last_page' => 1, 'per_page' => 15, 'total' => 0],
+                'mahasiswa' => [],
+                'mataKuliah' => [],
+                'prodi' => [],
+                'kelas' => [],
+                'filters' => $request->only(['search', 'mahasiswa_id', 'mata_kuliah_id', 'prodi_id', 'kelas_id', 'per_page'])
+            ]);
+        }
     }
 
     public function store(Request $request)

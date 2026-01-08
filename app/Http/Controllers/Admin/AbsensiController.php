@@ -47,8 +47,66 @@ class AbsensiController extends Controller
         }
 
         $absensi = $query->orderBy('tanggal', 'desc')->paginate(15);
-        $mahasiswa = Mahasiswa::with('prodi')->get();
-        $jadwal = Jadwal::with(['kelas', 'mataKuliah'])->get();
+        
+        // Transform data untuk frontend
+        $absensi->getCollection()->transform(function($item) {
+            return [
+                'id' => $item->id,
+                'mahasiswa_id' => $item->mahasiswa_id,
+                'jadwal_id' => $item->jadwal_id,
+                'tanggal' => $item->tanggal,
+                'status' => $item->status,
+                'keterangan' => $item->keterangan,
+                'mahasiswa' => [
+                    'id' => $item->mahasiswa->id,
+                    'nim' => $item->mahasiswa->nim,
+                    'nama' => $item->mahasiswa->nama,
+                ],
+                'jadwal' => [
+                    'id' => $item->jadwal->id,
+                    'hari' => $item->jadwal->hari,
+                    'jam_mulai' => date('H:i', strtotime($item->jadwal->jam_mulai)),
+                    'jam_selesai' => date('H:i', strtotime($item->jadwal->jam_selesai)),
+                    'kelas' => [
+                        'id' => $item->jadwal->kelas->id,
+                        'nama_kelas' => $item->jadwal->kelas->nama_kelas,
+                    ],
+                    'mata_kuliah' => [
+                        'id' => $item->jadwal->mataKuliah->id,
+                        'nama' => $item->jadwal->mataKuliah->nama_mk,
+                        'kode' => $item->jadwal->mataKuliah->kode_mk,
+                    ],
+                ],
+            ];
+        });
+        
+        // Transform mahasiswa data
+        $mahasiswa = Mahasiswa::with('prodi')->get()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'nim' => $item->nim,
+                'nama' => $item->nama,
+            ];
+        });
+        
+        // Transform jadwal data
+        $jadwal = Jadwal::with(['kelas', 'mataKuliah'])->get()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'hari' => $item->hari,
+                'jam_mulai' => date('H:i', strtotime($item->jam_mulai)),
+                'jam_selesai' => date('H:i', strtotime($item->jam_selesai)),
+                'kelas' => [
+                    'id' => $item->kelas->id,
+                    'nama_kelas' => $item->kelas->nama_kelas,
+                ],
+                'mata_kuliah' => [
+                    'id' => $item->mataKuliah->id,
+                    'nama' => $item->mataKuliah->nama_mk,
+                    'kode' => $item->mataKuliah->kode_mk,
+                ],
+            ];
+        });
 
         return Inertia::render('Admin/Absensi/Index', [
             'absensi' => $absensi,
@@ -86,16 +144,13 @@ class AbsensiController extends Controller
     public function update(Request $request, Absensi $absensi)
     {
         $validated = $request->validate([
-            'mahasiswa_id' => 'required|exists:mahasiswa,id',
-            'jadwal_id' => 'required|exists:jadwal,id',
-            'tanggal' => 'required|date',
             'status' => 'required|in:Hadir,Izin,Sakit,Alpa',
             'keterangan' => 'nullable|string|max:255'
         ]);
 
         $absensi->update($validated);
 
-        return back()->with('success', 'Absensi berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Status absensi berhasil diperbarui!');
     }
 
     public function destroy(Absensi $absensi)

@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import Sidebar from '@/Components/Layout/Sidebar';
 import Header from '@/Components/Layout/Header';
-import AbsensiFormModal from '@/Components/Modals/AbsensiFormModal';
+import EditStatusAbsensiModal from '@/Components/Modals/EditStatusAbsensiModal';
 import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal';
 import Toast from '@/Components/Toast';
+import Pagination from '@/Components/Pagination';
 
 interface Absensi {
     id: number;
@@ -25,7 +26,9 @@ interface Absensi {
             nama_kelas: string;
         };
         mata_kuliah: {
-            nama_mk: string;
+            id: number;
+            nama: string;
+            kode: string;
         };
     };
 }
@@ -42,10 +45,13 @@ interface Jadwal {
     jam_mulai: string;
     jam_selesai: string;
     kelas: {
+        id: number;
         nama_kelas: string;
     };
     mata_kuliah: {
-        nama_mk: string;
+        id: number;
+        nama: string;
+        kode: string;
     };
 }
 
@@ -88,11 +94,10 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const [formData, setFormData] = useState({
-        mahasiswa_id: '',
-        jadwal_id: '',
-        tanggal: '',
         status: '',
         keterangan: ''
     });
@@ -103,20 +108,18 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
         setShowToast(true);
     };
 
-    if (flash.success && !showToast) {
-        showToastMessage(flash.success, 'success');
-    }
-
-    if (flash.error && !showToast) {
-        showToastMessage(flash.error, 'error');
-    }
+    useEffect(() => {
+        if (flash.success) {
+            showToastMessage(flash.success, 'success');
+        }
+        if (flash.error) {
+            showToastMessage(flash.error, 'error');
+        }
+    }, [flash]);
 
     const handleEdit = (item: Absensi) => {
         setSelectedAbsensi(item);
         setFormData({
-            mahasiswa_id: item.mahasiswa_id.toString(),
-            jadwal_id: item.jadwal_id.toString(),
-            tanggal: item.tanggal,
             status: item.status,
             keterangan: item.keterangan || ''
         });
@@ -127,8 +130,19 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
         e.preventDefault();
         
         if (selectedAbsensi) {
+            setIsLoading(true);
             router.put(`/admin/absensi/${selectedAbsensi.id}`, formData, {
-                onSuccess: () => setShowModal(false)
+                preserveState: false,
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowModal(false);
+                    setIsLoading(false);
+                },
+                onError: (errors) => {
+                    setIsLoading(false);
+                    const errorMessage = Object.values(errors).flat().join(', ') || 'Gagal memperbarui status absensi!';
+                    showToastMessage(errorMessage, 'error');
+                }
             });
         }
     };
@@ -140,19 +154,41 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
 
     const confirmDelete = () => {
         if (selectedAbsensi) {
+            setIsDeleting(true);
             router.delete(`/admin/absensi/${selectedAbsensi.id}`, {
-                onSuccess: () => setShowDeleteModal(false)
+                preserveState: false,
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowDeleteModal(false);
+                    setIsDeleting(false);
+                },
+                onError: (errors) => {
+                    setIsDeleting(false);
+                    const errorMessage = Object.values(errors).flat().join(', ') || 'Gagal menghapus data absensi!';
+                    showToastMessage(errorMessage, 'error');
+                }
             });
         }
     };
 
-    const filteredAbsensi = absensi.data.filter(item => {
-        const matchSearch = item.mahasiswa.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           item.mahasiswa.nim.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           item.jadwal?.mata_kuliah?.nama_mk?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchStatus = filterStatus === '' || item.status === filterStatus;
-        return matchSearch && matchStatus;
-    });
+    // Use server-side pagination data directly
+    const displayedAbsensi = absensi.data;
+    
+    // Handle search and filter with debounce
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            const params: any = {};
+            if (searchTerm) params.search = searchTerm;
+            if (filterStatus) params.status = filterStatus;
+            
+            router.get('', params, { 
+                preserveState: true, 
+                preserveScroll: true 
+            });
+        }, 500);
+        
+        return () => clearTimeout(timeoutId);
+    }, [searchTerm, filterStatus]);
 
     const getStatusBadge = (status: string) => {
         const badges = {
@@ -251,11 +287,11 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                        {filteredAbsensi.length > 0 ? (
-                                            filteredAbsensi.map((item, index) => (
+                                        {displayedAbsensi.length > 0 ? (
+                                            displayedAbsensi.map((item, index) => (
                                                 <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                                        {index + 1}
+                                                        {(absensi.current_page - 1) * absensi.per_page + index + 1}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                                                         <div>
@@ -272,7 +308,10 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                                        {item.jadwal?.mata_kuliah?.nama_mk || '-'}
+                                                        <div>
+                                                            <div className="font-medium">{item.jadwal?.mata_kuliah?.nama || '-'}</div>
+                                                            <div className="text-xs text-gray-500 dark:text-gray-400">{item.jadwal?.mata_kuliah?.kode || ''}</div>
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                                                         <div>
@@ -288,7 +327,39 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                                        {item.keterangan || '-'}
+                                                        {item.keterangan ? (
+                                                            <div className="max-w-xs">
+                                                                <div className="truncate" title={item.keterangan}>
+                                                                    {item.keterangan}
+                                                                </div>
+                                                                {item.keterangan.length > 50 && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const modal = document.createElement('div');
+                                                                            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                                                                            modal.innerHTML = `
+                                                                                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg mx-4 shadow-xl">
+                                                                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Keterangan Lengkap</h3>
+                                                                                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">${item.keterangan}</p>
+                                                                                    <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-full">Tutup</button>
+                                                                                </div>
+                                                                            `;
+                                                                            modal.addEventListener('click', (e) => {
+                                                                                if (e.target === modal || (e.target as HTMLElement).tagName === 'BUTTON') {
+                                                                                    modal.remove();
+                                                                                }
+                                                                            });
+                                                                            document.body.appendChild(modal);
+                                                                        }}
+                                                                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1"
+                                                                    >
+                                                                        Lihat selengkapnya
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-gray-400 dark:text-gray-500 italic">-</span>
+                                                        )}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                                         <div className="flex justify-center gap-2">
@@ -326,31 +397,56 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
                                     </tbody>
                                 </table>
                             </div>
+                            
+                            {/* Pagination */}
+                            <Pagination
+                                currentPage={absensi.current_page}
+                                lastPage={absensi.last_page}
+                                total={absensi.total}
+                                perPage={absensi.per_page}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {showModal && (
-                <AbsensiFormModal
+            {showModal && selectedAbsensi && (
+                <EditStatusAbsensiModal
                     show={showModal}
-                    onClose={() => setShowModal(false)}
+                    onClose={() => {
+                        if (!isLoading) {
+                            setShowModal(false);
+                        }
+                    }}
                     onSubmit={handleSubmit}
                     formData={formData}
                     setFormData={setFormData}
-                    mahasiswa={mahasiswa}
-                    jadwal={jadwal}
-                    isEdit={true}
+                    mahasiswaInfo={{
+                        nama: selectedAbsensi.mahasiswa.nama,
+                        nim: selectedAbsensi.mahasiswa.nim
+                    }}
+                    jadwalInfo={{
+                        mata_kuliah: selectedAbsensi.jadwal?.mata_kuliah?.nama || '-',
+                        hari: selectedAbsensi.jadwal.hari,
+                        jam: `${selectedAbsensi.jadwal.jam_mulai} - ${selectedAbsensi.jadwal.jam_selesai}`
+                    }}
+                    tanggal={selectedAbsensi.tanggal}
+                    isLoading={isLoading}
                 />
             )}
 
             <DeleteConfirmationModal
                 show={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
+                onClose={() => {
+                    if (!isDeleting) {
+                        setShowDeleteModal(false);
+                    }
+                }}
                 onConfirm={confirmDelete}
                 title="Hapus Absensi"
                 message={`Apakah Anda yakin ingin menghapus data absensi pada tanggal ${selectedAbsensi?.tanggal}?`}
                 itemName={selectedAbsensi?.mahasiswa.nama || ''}
+                isLoading={isDeleting}
             />
 
             {showToast && (

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import Sidebar from '@/Components/Layout/Sidebar';
 import Header from '@/Components/Layout/Header';
 import Toast from '@/Components/Toast';
@@ -8,18 +8,27 @@ interface Nilai {
     id: number;
     mahasiswa_id: number;
     mata_kuliah_id: number;
+    semester: number;
+    tahun_ajaran: string;
     tugas: number;
     uts: number;
     uas: number;
     nilai_akhir: number;
     grade: string;
     mahasiswa: {
+        id: number;
         nim: string;
         nama: string;
+        prodi: {
+            id: number;
+            nama_prodi: string;
+        };
     };
     mata_kuliah: {
-        kode_mk: string;
-        nama_mk: string;
+        id: number;
+        nama: string;
+        kode: string;
+        sks: number;
     };
 }
 
@@ -27,12 +36,29 @@ interface Mahasiswa {
     id: number;
     nim: string;
     nama: string;
+    prodi: {
+        id: number;
+        nama_prodi: string;
+    };
 }
 
 interface MataKuliah {
     id: number;
-    kode_mk: string;
-    nama_mk: string;
+    nama: string;
+    kode: string;
+    sks: number;
+}
+
+interface Prodi {
+    id: number;
+    nama_prodi: string;
+}
+
+interface Kelas {
+    id: number;
+    nama_kelas: string;
+    prodi_id: number;
+    prodi_nama: string;
 }
 
 interface Props {
@@ -45,13 +71,23 @@ interface Props {
     };
     mahasiswa: Mahasiswa[];
     mataKuliah: MataKuliah[];
+    prodi: Prodi[];
+    kelas: Kelas[];
+    filters: {
+        search?: string;
+        prodi_id?: number;
+        kelas_id?: number;
+        mahasiswa_id?: number;
+        mata_kuliah_id?: number;
+        per_page?: number;
+    };
     flash: {
         success?: string;
         error?: string;
     };
 }
 
-export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
+export default function Index({ nilai, mahasiswa, mataKuliah, prodi, kelas, filters, flash }: Props) {
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('darkMode');
@@ -66,8 +102,10 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
         }
         return true;
     });
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [filterGrade, setFilterGrade] = useState('');
+    const [filterProdi, setFilterProdi] = useState(filters.prodi_id || '');
+    const [filterKelas, setFilterKelas] = useState(filters.kelas_id || '');
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error'>('success');
@@ -86,10 +124,31 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
         showToastMessage(flash.error, 'error');
     }
 
+    const handleFilterChange = (key: string, value: string) => {
+        const params: any = { ...filters };
+        
+        if (value) {
+            params[key] = value;
+        } else {
+            delete params[key];
+        }
+        
+        // Reset kelas filter when prodi changes
+        if (key === 'prodi_id') {
+            delete params.kelas_id;
+            setFilterKelas('');
+        }
+        
+        router.get('/admin/nilai', params, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
     const filteredNilai = nilai.data.filter(item => {
         const matchSearch = item.mahasiswa.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            item.mahasiswa.nim.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           item.mata_kuliah.nama_mk.toLowerCase().includes(searchTerm.toLowerCase());
+                           item.mata_kuliah.nama.toLowerCase().includes(searchTerm.toLowerCase());
         const matchGrade = filterGrade === '' || item.grade === filterGrade;
         return matchSearch && matchGrade;
     });
@@ -139,8 +198,8 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
                                 </svg>
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pencarian & Filter</h3>
                             </div>
-                            <div className="flex flex-col md:flex-row gap-3">
-                                <div className="flex-1">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                                <div className="lg:col-span-2">
                                     <input
                                         type="text"
                                         placeholder="Cari mahasiswa, NIM, mata kuliah..."
@@ -151,9 +210,45 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
                                 </div>
                                 <div>
                                     <select
+                                        value={filterProdi}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setFilterProdi(value);
+                                            handleFilterChange('prodi_id', value);
+                                        }}
+                                        className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    >
+                                        <option value="">Semua Prodi</option>
+                                        {prodi.map(p => (
+                                            <option key={p.id} value={p.id}>{p.nama_prodi}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <select
+                                        value={filterKelas}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setFilterKelas(value);
+                                            handleFilterChange('kelas_id', value);
+                                        }}
+                                        disabled={!filterProdi}
+                                        className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50"
+                                    >
+                                        <option value="">Semua Kelas</option>
+                                        {kelas
+                                            .filter(k => !filterProdi || k.prodi_id === parseInt(filterProdi as string))
+                                            .map(k => (
+                                                <option key={k.id} value={k.id}>{k.nama_kelas}</option>
+                                            ))
+                                        }
+                                    </select>
+                                </div>
+                                <div>
+                                    <select
                                         value={filterGrade}
                                         onChange={(e) => setFilterGrade(e.target.value)}
-                                        className="px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        className="w-full px-4 py-3 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     >
                                         <option value="">Semua Grade</option>
                                         <option value="A">A</option>
@@ -198,21 +293,21 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
                                                         <div>
-                                                            <div className="font-medium">{item.mata_kuliah.nama_mk}</div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-400">{item.mata_kuliah.kode_mk}</div>
+                                                            <div className="font-medium">{item.mata_kuliah.nama}</div>
+                                                            <div className="text-xs text-gray-500 dark:text-gray-400">{item.mata_kuliah.kode} • {item.mata_kuliah.sks} SKS</div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-gray-300">
-                                                        {item.tugas}
+                                                        {item.tugas ?? 0}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-gray-300">
-                                                        {item.uts}
+                                                        {item.uts ?? 0}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-gray-300">
-                                                        {item.uas}
+                                                        {item.uas ?? 0}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-bold text-blue-600 dark:text-blue-400">
-                                                        {item.nilai_akhir.toFixed(2)}
+                                                        {Number(item.nilai_akhir ?? 0).toFixed(2)}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                                                         <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getGradeBadgeColor(item.grade)}`}>
@@ -231,6 +326,91 @@ export default function Index({ nilai, mahasiswa, mataKuliah, flash }: Props) {
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Pagination */}
+                            {nilai.last_page > 1 && (
+                                <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                                            Menampilkan <span className="font-medium">{(nilai.current_page - 1) * nilai.per_page + 1}</span> - 
+                                            <span className="font-medium"> {Math.min(nilai.current_page * nilai.per_page, nilai.total)}</span> dari 
+                                            <span className="font-medium"> {nilai.total}</span> data
+                                        </div>
+                                        <div className="flex gap-2">
+                                            {nilai.current_page > 1 && (
+                                                <button
+                                                    onClick={() => {
+                                                        router.get('/admin/nilai', {
+                                                            ...filters,
+                                                            page: nilai.current_page - 1
+                                                        }, {
+                                                            preserveState: true,
+                                                            preserveScroll: true,
+                                                        });
+                                                    }}
+                                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+                                                >
+                                                    Sebelumnya
+                                                </button>
+                                            )}
+                                            
+                                            <div className="flex gap-1">
+                                                {Array.from({ length: nilai.last_page }, (_, i) => i + 1)
+                                                    .filter(page => {
+                                                        return page === 1 || 
+                                                               page === nilai.last_page || 
+                                                               (page >= nilai.current_page - 1 && page <= nilai.current_page + 1);
+                                                    })
+                                                    .map((page, index, array) => (
+                                                        <span key={page}>
+                                                            {index > 0 && array[index - 1] !== page - 1 && (
+                                                                <span className="px-2 py-2 text-gray-500">...</span>
+                                                            )}
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (page !== nilai.current_page) {
+                                                                        router.get('/admin/nilai', {
+                                                                            ...filters,
+                                                                            page: page
+                                                                        }, {
+                                                                            preserveState: true,
+                                                                            preserveScroll: true,
+                                                                        });
+                                                                    }
+                                                                }}
+                                                                className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                                                                    page === nilai.current_page
+                                                                        ? 'bg-blue-600 text-white'
+                                                                        : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
+                                                                }`}
+                                                            >
+                                                                {page}
+                                                            </button>
+                                                        </span>
+                                                    ))
+                                                }
+                                            </div>
+
+                                            {nilai.current_page < nilai.last_page && (
+                                                <button
+                                                    onClick={() => {
+                                                        router.get('/admin/nilai', {
+                                                            ...filters,
+                                                            page: nilai.current_page + 1
+                                                        }, {
+                                                            preserveState: true,
+                                                            preserveScroll: true,
+                                                        });
+                                                    }}
+                                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+                                                >
+                                                    Selanjutnya
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

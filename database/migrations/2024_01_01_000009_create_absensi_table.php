@@ -13,7 +13,8 @@ return new class extends Migration
             $table->foreignId('jadwal_id')->constrained('jadwal')->onDelete('cascade');
             $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
             $table->date('tanggal');
-            $table->enum('status', ['hadir', 'izin', 'sakit', 'alpha']);
+            $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alpa']);
+            $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }

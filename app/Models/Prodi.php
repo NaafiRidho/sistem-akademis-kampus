@@ -10,6 +10,13 @@ class Prodi extends Model
 {
     protected $table = 'prodi';
     protected $fillable = ['fakultas_id', 'nama_prodi'];
+    
+    protected $appends = ['nama'];
+
+    public function getNamaAttribute()
+    {
+        return $this->nama_prodi;
+    }
 
     public function fakultas(): BelongsTo
     {

@@ -75,4 +75,11 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
 // Dosen Routes
 Route::middleware(['dosen'])->prefix('dosen')->name('dosen.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Dosen\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Jadwal Mengajar
+    Route::get('/jadwal', [\App\Http\Controllers\Dosen\JadwalController::class, 'index'])->name('jadwal.index');
+    
+    // Kelas yang Diampu
+    Route::get('/kelas', [\App\Http\Controllers\Dosen\KelasController::class, 'index'])->name('kelas.index');
+    Route::get('/kelas/{id}/mahasiswa', [\App\Http\Controllers\Dosen\KelasController::class, 'mahasiswa'])->name('kelas.mahasiswa');
 });
