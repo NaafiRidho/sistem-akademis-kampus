@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from "react";
-import { Head, router } from "@inertiajs/react";
+import { Head, router, Link } from "@inertiajs/react";
 import DosenSidebar from "@/Components/Layout/DosenSidebar";
-import DosenHeader from "@/Components/Layout/DosenHeader";
+import Header from "@/Components/Layout/Header";
 
 interface MataKuliah {
     id: number;
@@ -188,7 +188,7 @@ export default function Create({ mataKuliahList = [] }: Props) {
                         sidebarOpen ? "lg:ml-64" : "lg:ml-0"
                     }`}
                 >
-                    <DosenHeader
+                    <Header
                         sidebarOpen={sidebarOpen}
                         setSidebarOpen={setSidebarOpen}
                         darkMode={darkMode}
@@ -198,6 +198,19 @@ export default function Create({ mataKuliahList = [] }: Props) {
                     />
 
                     <div className="max-w-3xl mx-auto">
+                        {/* Back Button */}
+                        <div className="mb-4">
+                            <Link
+                                href="/dosen/materi"
+                                className="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                            >
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                Kembali ke Daftar Materi
+                            </Link>
+                        </div>
+
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">

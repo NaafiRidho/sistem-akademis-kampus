@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import DosenSidebar from '@/Components/Layout/DosenSidebar';
-import DosenHeader from '@/Components/Layout/DosenHeader';
+import Header from '@/Components/Layout/Header';
 import DeleteConfirmationModal from '@/Components/Modals/DeleteConfirmationModal';
 
 interface MataKuliah {
@@ -168,7 +168,7 @@ export default function Index({ materi, mataKuliahList, filters }: Props) {
                 <DosenSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeMenu="materi" />
 
                 <div className={`p-4 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'}`}>
-                    <DosenHeader
+                    <Header
                         sidebarOpen={sidebarOpen}
                         setSidebarOpen={setSidebarOpen}
                         darkMode={darkMode}
