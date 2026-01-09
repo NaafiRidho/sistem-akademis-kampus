@@ -82,4 +82,11 @@ Route::middleware(['dosen'])->prefix('dosen')->name('dosen.')->group(function ()
     // Kelas yang Diampu
     Route::get('/kelas', [\App\Http\Controllers\Dosen\KelasController::class, 'index'])->name('kelas.index');
     Route::get('/kelas/{id}/mahasiswa', [\App\Http\Controllers\Dosen\KelasController::class, 'mahasiswa'])->name('kelas.mahasiswa');
+    
+    // Materi Pembelajaran
+    Route::get('/materi', [\App\Http\Controllers\Dosen\MateriController::class, 'index'])->name('materi.index');
+    Route::get('/materi/create', [\App\Http\Controllers\Dosen\MateriController::class, 'create'])->name('materi.create');
+    Route::post('/materi', [\App\Http\Controllers\Dosen\MateriController::class, 'store'])->name('materi.store');
+    Route::delete('/materi/{id}', [\App\Http\Controllers\Dosen\MateriController::class, 'destroy'])->name('materi.destroy');
+    Route::get('/materi/{id}/download', [\App\Http\Controllers\Dosen\MateriController::class, 'download'])->name('materi.download');
 });
