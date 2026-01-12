@@ -89,4 +89,16 @@ Route::middleware(['dosen'])->prefix('dosen')->name('dosen.')->group(function ()
     Route::post('/materi', [\App\Http\Controllers\Dosen\MateriController::class, 'store'])->name('materi.store');
     Route::delete('/materi/{id}', [\App\Http\Controllers\Dosen\MateriController::class, 'destroy'])->name('materi.destroy');
     Route::get('/materi/{id}/download', [\App\Http\Controllers\Dosen\MateriController::class, 'download'])->name('materi.download');
+    
+    // Tugas
+    Route::get('/tugas', [\App\Http\Controllers\Dosen\TugasController::class, 'index'])->name('tugas.index');
+    Route::get('/tugas/create', [\App\Http\Controllers\Dosen\TugasController::class, 'create'])->name('tugas.create');
+    Route::post('/tugas', [\App\Http\Controllers\Dosen\TugasController::class, 'store'])->name('tugas.store');
+    Route::get('/tugas/{id}', [\App\Http\Controllers\Dosen\TugasController::class, 'show'])->name('tugas.show');
+    Route::get('/tugas/{id}/edit', [\App\Http\Controllers\Dosen\TugasController::class, 'edit'])->name('tugas.edit');
+    Route::put('/tugas/{id}', [\App\Http\Controllers\Dosen\TugasController::class, 'update'])->name('tugas.update');
+    Route::delete('/tugas/{id}', [\App\Http\Controllers\Dosen\TugasController::class, 'destroy'])->name('tugas.destroy');
+    Route::get('/tugas/{id}/download', [\App\Http\Controllers\Dosen\TugasController::class, 'download'])->name('tugas.download');
+    Route::get('/tugas/pengumpulan/{id}/download', [\App\Http\Controllers\Dosen\TugasController::class, 'downloadPengumpulan'])->name('tugas.pengumpulan.download');
+    Route::post('/tugas/pengumpulan/{id}/nilai', [\App\Http\Controllers\Dosen\TugasController::class, 'nilai'])->name('tugas.pengumpulan.nilai');
 });

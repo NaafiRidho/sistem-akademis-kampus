@@ -1,48 +1,48 @@
 {
-  "_DeleteConfirmationModal-BST_hW77.js": {
-    "file": "assets/DeleteConfirmationModal-BST_hW77.js",
+  "_DeleteConfirmationModal-CHxpsjI6.js": {
+    "file": "assets/DeleteConfirmationModal-CHxpsjI6.js",
     "name": "DeleteConfirmationModal",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_DosenSidebar-BEKHv2yG.js": {
-    "file": "assets/DosenSidebar-BEKHv2yG.js",
+  "_DosenSidebar-819te7Vc.js": {
+    "file": "assets/DosenSidebar-819te7Vc.js",
     "name": "DosenSidebar",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Header-BlC7YqyD.js": {
-    "file": "assets/Header-BlC7YqyD.js",
+  "_Header-BfngwH03.js": {
+    "file": "assets/Header-BfngwH03.js",
     "name": "Header",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_ImportModal-BbxnhypM.js": {
-    "file": "assets/ImportModal-BbxnhypM.js",
+  "_ImportModal-wckBDFTi.js": {
+    "file": "assets/ImportModal-wckBDFTi.js",
     "name": "ImportModal",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_LoadingButton-BX2u2lNT.js": {
-    "file": "assets/LoadingButton-BX2u2lNT.js",
+  "_LoadingButton-CmFYffF5.js": {
+    "file": "assets/LoadingButton-CmFYffF5.js",
     "name": "LoadingButton",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Sidebar-C2hE0Qyc.js": {
-    "file": "assets/Sidebar-C2hE0Qyc.js",
+  "_Sidebar-sJs4uxL3.js": {
+    "file": "assets/Sidebar-sJs4uxL3.js",
     "name": "Sidebar",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Toast-CfLzuGH_.js": {
-    "file": "assets/Toast-CfLzuGH_.js",
+  "_Toast-Bbio7Tun.js": {
+    "file": "assets/Toast-Bbio7Tun.js",
     "name": "Toast",
     "imports": [
       "resources/js/app.tsx"
@@ -53,7 +53,7 @@
     "name": "route"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DvHcH-Gq.css",
+    "file": "assets/app-Bg02R8MK.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -62,157 +62,157 @@
     ]
   },
   "resources/js/Pages/Admin/Absensi/Index.tsx": {
-    "file": "assets/Index-gYGOoWBH.js",
+    "file": "assets/Index-BXsvHQqv.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Absensi/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js",
-      "_DeleteConfirmationModal-BST_hW77.js",
-      "_Toast-CfLzuGH_.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js",
+      "_DeleteConfirmationModal-CHxpsjI6.js",
+      "_Toast-Bbio7Tun.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Admin/Dashboard.tsx": {
-    "file": "assets/Dashboard-CTRbDf5B.js",
+    "file": "assets/Dashboard-c-PPA-D4.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Admin/Dashboard.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Admin/Dosen/Index.tsx": {
-    "file": "assets/Index-CulRDRZA.js",
+    "file": "assets/Index-DX5JhwdG.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Dosen/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js",
-      "_ImportModal-BbxnhypM.js",
-      "_LoadingButton-BX2u2lNT.js",
-      "_DeleteConfirmationModal-BST_hW77.js",
-      "_Toast-CfLzuGH_.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js",
+      "_ImportModal-wckBDFTi.js",
+      "_LoadingButton-CmFYffF5.js",
+      "_DeleteConfirmationModal-CHxpsjI6.js",
+      "_Toast-Bbio7Tun.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Admin/Fakultas/Index.tsx": {
-    "file": "assets/Index-BXjgdFu6.js",
+    "file": "assets/Index-BGSdExx3.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Fakultas/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js",
-      "_ImportModal-BbxnhypM.js",
-      "_DeleteConfirmationModal-BST_hW77.js",
-      "_Toast-CfLzuGH_.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js",
+      "_ImportModal-wckBDFTi.js",
+      "_DeleteConfirmationModal-CHxpsjI6.js",
+      "_Toast-Bbio7Tun.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Admin/Jadwal/Index.tsx": {
-    "file": "assets/Index-De2Eyg1w.js",
+    "file": "assets/Index-D8bXz2eE.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Jadwal/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js",
-      "_ImportModal-BbxnhypM.js",
-      "_LoadingButton-BX2u2lNT.js",
-      "_DeleteConfirmationModal-BST_hW77.js",
-      "_Toast-CfLzuGH_.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js",
+      "_ImportModal-wckBDFTi.js",
+      "_LoadingButton-CmFYffF5.js",
+      "_DeleteConfirmationModal-CHxpsjI6.js",
+      "_Toast-Bbio7Tun.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Admin/Mahasiswa/Index.tsx": {
-    "file": "assets/Index-DJOskyGH.js",
+    "file": "assets/Index-CcGfhRX7.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Mahasiswa/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js",
-      "_ImportModal-BbxnhypM.js",
-      "_LoadingButton-BX2u2lNT.js",
-      "_DeleteConfirmationModal-BST_hW77.js",
-      "_Toast-CfLzuGH_.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js",
+      "_ImportModal-wckBDFTi.js",
+      "_LoadingButton-CmFYffF5.js",
+      "_DeleteConfirmationModal-CHxpsjI6.js",
+      "_Toast-Bbio7Tun.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Admin/MataKuliah/Index.tsx": {
-    "file": "assets/Index-wT6FQFzn.js",
+    "file": "assets/Index-BT-JRQY0.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/MataKuliah/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js",
-      "_ImportModal-BbxnhypM.js",
-      "_DeleteConfirmationModal-BST_hW77.js",
-      "_Toast-CfLzuGH_.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js",
+      "_ImportModal-wckBDFTi.js",
+      "_DeleteConfirmationModal-CHxpsjI6.js",
+      "_Toast-Bbio7Tun.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Admin/Nilai/Index.tsx": {
-    "file": "assets/Index-FZVrnbgb.js",
+    "file": "assets/Index-Dh_SnqDk.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Nilai/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js",
-      "_Toast-CfLzuGH_.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js",
+      "_Toast-Bbio7Tun.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Admin/Prodi/Index.tsx": {
-    "file": "assets/Index-ZWGKKeng.js",
+    "file": "assets/Index-BKv_PlO5.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Prodi/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Sidebar-C2hE0Qyc.js",
-      "_Header-BlC7YqyD.js",
-      "_ImportModal-BbxnhypM.js",
-      "_DeleteConfirmationModal-BST_hW77.js",
-      "_Toast-CfLzuGH_.js"
+      "_Sidebar-sJs4uxL3.js",
+      "_Header-BfngwH03.js",
+      "_ImportModal-wckBDFTi.js",
+      "_DeleteConfirmationModal-CHxpsjI6.js",
+      "_Toast-Bbio7Tun.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Auth/Login.tsx": {
-    "file": "assets/Login-QONLRFUZ.js",
+    "file": "assets/Login-BdACLhf3.js",
     "name": "Login",
     "src": "resources/js/Pages/Auth/Login.tsx",
     "isDynamicEntry": true,
@@ -220,99 +220,155 @@
       "resources/js/app.tsx"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Dosen/Dashboard.tsx": {
-    "file": "assets/Dashboard-Cwi6ElWq.js",
+    "file": "assets/Dashboard-du74PAL3.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Dosen/Dashboard.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_DosenSidebar-BEKHv2yG.js",
-      "_Header-BlC7YqyD.js"
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Dosen/Jadwal/Index.tsx": {
-    "file": "assets/Index-BL4WdDw4.js",
+    "file": "assets/Index-DNXMIxTw.js",
     "name": "Index",
     "src": "resources/js/Pages/Dosen/Jadwal/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_DosenSidebar-BEKHv2yG.js",
-      "_Header-BlC7YqyD.js",
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js",
       "_route-2v7uN5tU.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Dosen/Kelas/Index.tsx": {
-    "file": "assets/Index-vLLllJVn.js",
+    "file": "assets/Index-Djv2g2vu.js",
     "name": "Index",
     "src": "resources/js/Pages/Dosen/Kelas/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_DosenSidebar-BEKHv2yG.js",
-      "_Header-BlC7YqyD.js",
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js",
       "_route-2v7uN5tU.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Dosen/Kelas/Mahasiswa.tsx": {
-    "file": "assets/Mahasiswa-DmznHVUE.js",
+    "file": "assets/Mahasiswa-DByNosbF.js",
     "name": "Mahasiswa",
     "src": "resources/js/Pages/Dosen/Kelas/Mahasiswa.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_DosenSidebar-BEKHv2yG.js",
-      "_Header-BlC7YqyD.js",
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js",
       "_route-2v7uN5tU.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Dosen/Materi/Create.tsx": {
-    "file": "assets/Create-BiOi93xl.js",
+    "file": "assets/Create-DYXZIwSG.js",
     "name": "Create",
     "src": "resources/js/Pages/Dosen/Materi/Create.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_DosenSidebar-BEKHv2yG.js",
-      "_Header-BlC7YqyD.js"
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Dosen/Materi/Index.tsx": {
-    "file": "assets/Index-C_EPNBfx.js",
+    "file": "assets/Index-qx_2qRck.js",
     "name": "Index",
     "src": "resources/js/Pages/Dosen/Materi/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_DosenSidebar-BEKHv2yG.js",
-      "_Header-BlC7YqyD.js",
-      "_DeleteConfirmationModal-BST_hW77.js"
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js",
+      "_DeleteConfirmationModal-CHxpsjI6.js"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
+    ]
+  },
+  "resources/js/Pages/Dosen/Tugas/Create.tsx": {
+    "file": "assets/Create-DYbvrKdN.js",
+    "name": "Create",
+    "src": "resources/js/Pages/Dosen/Tugas/Create.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js"
+    ],
+    "css": [
+      "assets/app-Bg02R8MK.css"
+    ]
+  },
+  "resources/js/Pages/Dosen/Tugas/Edit.tsx": {
+    "file": "assets/Edit-DIvhKkj8.js",
+    "name": "Edit",
+    "src": "resources/js/Pages/Dosen/Tugas/Edit.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js"
+    ],
+    "css": [
+      "assets/app-Bg02R8MK.css"
+    ]
+  },
+  "resources/js/Pages/Dosen/Tugas/Index.tsx": {
+    "file": "assets/Index-Cb1I8yLT.js",
+    "name": "Index",
+    "src": "resources/js/Pages/Dosen/Tugas/Index.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js"
+    ],
+    "css": [
+      "assets/app-Bg02R8MK.css"
+    ]
+  },
+  "resources/js/Pages/Dosen/Tugas/Show.tsx": {
+    "file": "assets/Show-CDvRFNyn.js",
+    "name": "Show",
+    "src": "resources/js/Pages/Dosen/Tugas/Show.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_DosenSidebar-819te7Vc.js",
+      "_Header-BfngwH03.js"
+    ],
+    "css": [
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/Pages/Welcome.tsx": {
-    "file": "assets/Welcome-CXJvUOM5.js",
+    "file": "assets/Welcome-BOJVuuHx.js",
     "name": "Welcome",
     "src": "resources/js/Pages/Welcome.tsx",
     "isDynamicEntry": true,
@@ -320,11 +376,11 @@
       "resources/js/app.tsx"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-tp0wqukF.js",
+    "file": "assets/app-Cf64rCg5.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
@@ -345,10 +401,14 @@
       "resources/js/Pages/Dosen/Kelas/Mahasiswa.tsx",
       "resources/js/Pages/Dosen/Materi/Create.tsx",
       "resources/js/Pages/Dosen/Materi/Index.tsx",
+      "resources/js/Pages/Dosen/Tugas/Create.tsx",
+      "resources/js/Pages/Dosen/Tugas/Edit.tsx",
+      "resources/js/Pages/Dosen/Tugas/Index.tsx",
+      "resources/js/Pages/Dosen/Tugas/Show.tsx",
       "resources/js/Pages/Welcome.tsx"
     ],
     "css": [
-      "assets/app-DvHcH-Gq.css"
+      "assets/app-Bg02R8MK.css"
     ]
   }
 }

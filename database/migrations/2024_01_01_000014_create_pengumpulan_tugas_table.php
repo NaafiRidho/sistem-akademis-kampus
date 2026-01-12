@@ -12,8 +12,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tugas_id')->constrained('tugas')->onDelete('cascade');
             $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
-            $table->string('file')->nullable();
+            $table->string('file_path');
+            $table->timestamp('waktu_pengumpulan')->useCurrent();
             $table->decimal('nilai', 5, 2)->nullable();
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }
