@@ -102,3 +102,22 @@ Route::middleware(['dosen'])->prefix('dosen')->name('dosen.')->group(function ()
     Route::get('/tugas/pengumpulan/{id}/download', [\App\Http\Controllers\Dosen\TugasController::class, 'downloadPengumpulan'])->name('tugas.pengumpulan.download');
     Route::post('/tugas/pengumpulan/{id}/nilai', [\App\Http\Controllers\Dosen\TugasController::class, 'nilai'])->name('tugas.pengumpulan.nilai');
 });
+
+// Mahasiswa Routes
+Route::middleware(['mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Mahasiswa\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Jadwal Kuliah
+    Route::get('/jadwal', [\App\Http\Controllers\Mahasiswa\JadwalController::class, 'index'])->name('jadwal.index');
+    
+    // Materi Pembelajaran
+    Route::get('/materi', [\App\Http\Controllers\Mahasiswa\MateriController::class, 'index'])->name('materi.index');
+    Route::get('/materi/{id}/download', [\App\Http\Controllers\Mahasiswa\MateriController::class, 'download'])->name('materi.download');
+    
+    // Tugas
+    Route::get('/tugas', [\App\Http\Controllers\Mahasiswa\TugasController::class, 'index'])->name('tugas.index');
+    Route::get('/tugas/{id}', [\App\Http\Controllers\Mahasiswa\TugasController::class, 'show'])->name('tugas.show');
+    Route::post('/tugas/{id}/submit', [\App\Http\Controllers\Mahasiswa\TugasController::class, 'submit'])->name('tugas.submit');
+    Route::get('/tugas/{id}/download', [\App\Http\Controllers\Mahasiswa\TugasController::class, 'download'])->name('tugas.download');
+    Route::get('/tugas/pengumpulan/{id}/download', [\App\Http\Controllers\Mahasiswa\TugasController::class, 'downloadPengumpulan'])->name('tugas.pengumpulan.download');
+});
