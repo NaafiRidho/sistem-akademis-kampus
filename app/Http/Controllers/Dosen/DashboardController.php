@@ -8,6 +8,7 @@ use App\Models\Dosen;
 use App\Models\Nilai;
 use App\Models\Absensi;
 use App\Models\MataKuliah;
+use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -95,8 +96,16 @@ class DashboardController extends Controller
                 ];
             });
 
+        // Count unread announcements
+        $unreadPengumumanCount = Pengumuman::whereIn('target_role', ['Dosen', 'Semua'])
+            ->whereDoesntHave('readers', function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->count();
+
         return Inertia::render('Dosen/Dashboard', [
             'dosen' => $dosen,
+            'unreadPengumumanCount' => $unreadPengumumanCount,
             'stats' => [
                 'total_mata_kuliah' => $totalMataKuliah,
                 'total_kelas' => $totalKelas,

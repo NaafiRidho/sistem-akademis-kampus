@@ -70,6 +70,9 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::post('absensi/import', [\App\Http\Controllers\Admin\AbsensiController::class, 'import'])->name('absensi.import');
     Route::get('absensi/template/download', [\App\Http\Controllers\Admin\AbsensiController::class, 'downloadTemplate'])->name('absensi.template');
     Route::get('absensi/rekap/{mahasiswa}', [\App\Http\Controllers\Admin\AbsensiController::class, 'rekap'])->name('absensi.rekap');
+    
+    // Pengumuman CRUD
+    Route::resource('pengumuman', \App\Http\Controllers\Admin\PengumumanController::class);
 });
 
 // Dosen Routes
@@ -101,6 +104,11 @@ Route::middleware(['dosen'])->prefix('dosen')->name('dosen.')->group(function ()
     Route::get('/tugas/{id}/download', [\App\Http\Controllers\Dosen\TugasController::class, 'download'])->name('tugas.download');
     Route::get('/tugas/pengumpulan/{id}/download', [\App\Http\Controllers\Dosen\TugasController::class, 'downloadPengumpulan'])->name('tugas.pengumpulan.download');
     Route::post('/tugas/pengumpulan/{id}/nilai', [\App\Http\Controllers\Dosen\TugasController::class, 'nilai'])->name('tugas.pengumpulan.nilai');
+    
+    // Pengumuman
+    Route::get('/pengumuman', [\App\Http\Controllers\Dosen\PengumumanController::class, 'index'])->name('pengumuman.index');
+    Route::get('/pengumuman/{id}', [\App\Http\Controllers\Dosen\PengumumanController::class, 'show'])->name('pengumuman.show');
+    Route::post('/pengumuman/{id}/mark-read', [\App\Http\Controllers\Dosen\PengumumanController::class, 'markAsRead'])->name('pengumuman.markAsRead');
 });
 
 // Mahasiswa Routes
@@ -120,4 +128,9 @@ Route::middleware(['mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group
     Route::post('/tugas/{id}/submit', [\App\Http\Controllers\Mahasiswa\TugasController::class, 'submit'])->name('tugas.submit');
     Route::get('/tugas/{id}/download', [\App\Http\Controllers\Mahasiswa\TugasController::class, 'download'])->name('tugas.download');
     Route::get('/tugas/pengumpulan/{id}/download', [\App\Http\Controllers\Mahasiswa\TugasController::class, 'downloadPengumpulan'])->name('tugas.pengumpulan.download');
+    
+    // Pengumuman
+    Route::get('/pengumuman', [\App\Http\Controllers\Mahasiswa\PengumumanController::class, 'index'])->name('pengumuman.index');
+    Route::get('/pengumuman/{id}', [\App\Http\Controllers\Mahasiswa\PengumumanController::class, 'show'])->name('pengumuman.show');
+    Route::post('/pengumuman/{id}/mark-read', [\App\Http\Controllers\Mahasiswa\PengumumanController::class, 'markAsRead'])->name('pengumuman.markAsRead');
 });

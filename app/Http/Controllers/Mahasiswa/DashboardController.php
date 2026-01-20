@@ -10,6 +10,7 @@ use App\Models\Absensi;
 use App\Models\Nilai;
 use App\Models\Tugas;
 use App\Models\PengumpulanTugas;
+use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -59,9 +60,9 @@ class DashboardController extends Controller
         $persentaseKehadiran = $totalAbsensi > 0 ? round(($hadir / $totalAbsensi) * 100, 2) : 0;
 
         // Statistik nilai
-        $nilaiTertinggi = Nilai::where('mahasiswa_id', $mahasiswa->id)->max('nilai');
-        $nilaiTerendah = Nilai::where('mahasiswa_id', $mahasiswa->id)->min('nilai');
-        $rataRataNilai = Nilai::where('mahasiswa_id', $mahasiswa->id)->avg('nilai');
+        $nilaiTertinggi = Nilai::where('mahasiswa_id', $mahasiswa->id)->max('nilai_akhir');
+        $nilaiTerendah = Nilai::where('mahasiswa_id', $mahasiswa->id)->min('nilai_akhir');
+        $rataRataNilai = Nilai::where('mahasiswa_id', $mahasiswa->id)->avg('nilai_akhir');
         $totalMataKuliah = Nilai::where('mahasiswa_id', $mahasiswa->id)->count();
 
         // Statistik tugas
@@ -71,10 +72,18 @@ class DashboardController extends Controller
             ->count();
         $tugasBelumDinilai = $totalTugas - $tugasDinilai;
 
+        // Count unread announcements
+        $unreadPengumumanCount = Pengumuman::whereIn('target_role', ['Mahasiswa', 'Semua'])
+            ->whereDoesntHave('readers', function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->count();
+
         return Inertia::render('Mahasiswa/Dashboard', [
             'mahasiswa' => $mahasiswa,
             'jadwalHariIni' => $jadwalHariIni,
             'tugasAktif' => $tugasAktif,
+            'unreadPengumumanCount' => $unreadPengumumanCount,
             'stats' => [
                 'persentase_kehadiran' => $persentaseKehadiran,
                 'total_absensi' => $totalAbsensi,
