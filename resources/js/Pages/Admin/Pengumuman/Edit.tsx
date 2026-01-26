@@ -136,8 +136,9 @@ export default function Edit({ pengumuman }: Props) {
                             </form>
                         </div>
                     </div>
-                    </div>
-                </main>
+                </div>
+            </div>
+            </main>
             </div>
         </div>
     );

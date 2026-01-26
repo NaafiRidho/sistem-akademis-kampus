@@ -128,8 +128,9 @@ export default function Create() {
                             </form>
                         </div>
                     </div>
-                    </div>
-                </main>
+                </div>
+            </div>
+            </main>
             </div>
         </div>
     );

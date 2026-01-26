@@ -129,8 +129,9 @@ export default function Show({ pengumuman, stats }: Props) {
                             </div>
                         </div>
                     </div>
-                    </div>
-                </main>
+                </div>
+            </div>
+            </main>
             </div>
         </div>
     );

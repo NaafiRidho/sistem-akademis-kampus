@@ -109,6 +109,26 @@ Route::middleware(['dosen'])->prefix('dosen')->name('dosen.')->group(function ()
     Route::get('/pengumuman', [\App\Http\Controllers\Dosen\PengumumanController::class, 'index'])->name('pengumuman.index');
     Route::get('/pengumuman/{id}', [\App\Http\Controllers\Dosen\PengumumanController::class, 'show'])->name('pengumuman.show');
     Route::post('/pengumuman/{id}/mark-read', [\App\Http\Controllers\Dosen\PengumumanController::class, 'markAsRead'])->name('pengumuman.markAsRead');
+    
+    // Absensi - Dosen can manage attendance for their classes
+    Route::get('/absensi', [\App\Http\Controllers\Dosen\AbsensiController::class, 'index'])->name('absensi.index');
+    Route::get('/absensi/create', [\App\Http\Controllers\Dosen\AbsensiController::class, 'create'])->name('absensi.create');
+    Route::post('/absensi', [\App\Http\Controllers\Dosen\AbsensiController::class, 'store'])->name('absensi.store');
+    Route::get('/absensi/get-mahasiswa', [\App\Http\Controllers\Dosen\AbsensiController::class, 'getMahasiswaByJadwal'])->name('absensi.getMahasiswa');
+    Route::get('/absensi/rekap', [\App\Http\Controllers\Dosen\AbsensiController::class, 'rekap'])->name('absensi.rekap');
+    Route::get('/absensi/{id}/edit', [\App\Http\Controllers\Dosen\AbsensiController::class, 'edit'])->name('absensi.edit');
+    Route::put('/absensi/{id}', [\App\Http\Controllers\Dosen\AbsensiController::class, 'update'])->name('absensi.update');
+    Route::delete('/absensi/{id}', [\App\Http\Controllers\Dosen\AbsensiController::class, 'destroy'])->name('absensi.destroy');
+    
+    // Nilai - Dosen can manage grades for their courses
+    Route::get('/nilai', [\App\Http\Controllers\Dosen\NilaiController::class, 'index'])->name('nilai.index');
+    Route::get('/nilai/create', [\App\Http\Controllers\Dosen\NilaiController::class, 'create'])->name('nilai.create');
+    Route::post('/nilai', [\App\Http\Controllers\Dosen\NilaiController::class, 'store'])->name('nilai.store');
+    Route::get('/nilai/get-mahasiswa', [\App\Http\Controllers\Dosen\NilaiController::class, 'getMahasiswaByKelasAndMataKuliah'])->name('nilai.getMahasiswa');
+    Route::get('/nilai/rekap', [\App\Http\Controllers\Dosen\NilaiController::class, 'rekap'])->name('nilai.rekap');
+    Route::get('/nilai/{id}/edit', [\App\Http\Controllers\Dosen\NilaiController::class, 'edit'])->name('nilai.edit');
+    Route::put('/nilai/{id}', [\App\Http\Controllers\Dosen\NilaiController::class, 'update'])->name('nilai.update');
+    Route::delete('/nilai/{id}', [\App\Http\Controllers\Dosen\NilaiController::class, 'destroy'])->name('nilai.destroy');
 });
 
 // Mahasiswa Routes
@@ -133,4 +153,12 @@ Route::middleware(['mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group
     Route::get('/pengumuman', [\App\Http\Controllers\Mahasiswa\PengumumanController::class, 'index'])->name('pengumuman.index');
     Route::get('/pengumuman/{id}', [\App\Http\Controllers\Mahasiswa\PengumumanController::class, 'show'])->name('pengumuman.show');
     Route::post('/pengumuman/{id}/mark-read', [\App\Http\Controllers\Mahasiswa\PengumumanController::class, 'markAsRead'])->name('pengumuman.markAsRead');
+    
+    // Absensi - Mahasiswa can view their attendance (read-only)
+    Route::get('/absensi', [\App\Http\Controllers\Mahasiswa\AbsensiController::class, 'index'])->name('absensi.index');
+    Route::get('/absensi/rekap', [\App\Http\Controllers\Mahasiswa\AbsensiController::class, 'rekap'])->name('absensi.rekap');
+    
+    // Nilai - Mahasiswa can view their grades (read-only)
+    Route::get('/nilai', [\App\Http\Controllers\Mahasiswa\NilaiController::class, 'index'])->name('nilai.index');
+    Route::get('/nilai/transkrip', [\App\Http\Controllers\Mahasiswa\NilaiController::class, 'transkrip'])->name('nilai.transkrip');
 });

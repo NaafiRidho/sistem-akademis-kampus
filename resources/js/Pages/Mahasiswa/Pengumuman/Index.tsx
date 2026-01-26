@@ -185,8 +185,9 @@ export default function Index({ pengumuman, unreadCount, filters }: Props) {
                             )}
                         </div>
                     </div>
-                    </div>
-                </main>
+                </div>
+            </div>
+            </main>
             </div>
         </div>
     );

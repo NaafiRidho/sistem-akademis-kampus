@@ -4,6 +4,29 @@ import { useEffect, useState } from 'react';
 export default function LoadingBar() {
     const [isLoading, setIsLoading] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [isDark, setIsDark] = useState(false);
+
+    // Detect dark mode from localStorage
+    useEffect(() => {
+        const checkDarkMode = () => {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            setIsDark(darkMode);
+        };
+
+        checkDarkMode();
+
+        // Listen for storage changes (when user toggles dark mode)
+        const handleStorageChange = () => checkDarkMode();
+        window.addEventListener('storage', handleStorageChange);
+        
+        // Poll for changes in case same-tab updates don't trigger storage event
+        const interval = setInterval(checkDarkMode, 500);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            clearInterval(interval);
+        };
+    }, []);
 
     useEffect(() => {
         const startHandler = () => {
@@ -48,26 +71,26 @@ export default function LoadingBar() {
             </div>
 
             {/* Loading Overlay */}
-            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998] flex items-center justify-center">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 flex flex-col items-center space-y-4 transform animate-pulse">
+            <div className={`fixed inset-0 backdrop-blur-sm z-[9998] flex items-center justify-center ${isDark ? 'bg-black/50' : 'bg-black/30'}`}>
+                <div className={`rounded-2xl shadow-2xl p-8 flex flex-col items-center space-y-4 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
                     {/* Spinner */}
                     <div className="relative">
-                        <div className="w-16 h-16 border-4 border-gray-200 dark:border-gray-700 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <div className={`w-16 h-16 border-4 rounded-full ${isDark ? 'border-gray-700' : 'border-gray-200'}`}></div>
+                        <div className={`absolute top-0 left-0 w-16 h-16 border-4 border-t-transparent rounded-full animate-spin ${isDark ? 'border-blue-400' : 'border-blue-500'}`}></div>
                     </div>
                     
                     {/* Text */}
                     <div className="text-center">
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <p className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                             Memproses...
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                             Mohon tunggu sebentar
                         </p>
                     </div>
                     
                     {/* Progress Text */}
-                    <div className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                    <div className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                         {progress.toFixed(0)}%
                     </div>
                 </div>
