@@ -17,9 +17,9 @@ interface NilaiSummary {
 }
 
 interface Props {
-    rekapNilai: NilaiSummary[];
-    mataKuliahList: any[];
-    kelasList: any[];
+    rekapNilai?: NilaiSummary[];
+    mataKuliahList?: any[];
+    kelasList?: any[];
     filters: {
         mata_kuliah_id?: number;
         kelas_id?: number;
@@ -28,8 +28,13 @@ interface Props {
     };
 }
 
-export default function NilaiRekap({ rekapNilai, mataKuliahList, kelasList, filters }: Props) {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+export default function NilaiRekap({ rekapNilai = [], mataKuliahList = [], kelasList = [], filters }: Props) {
+    const [sidebarOpen, setSidebarOpen] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 1024;
+        }
+        return true;
+    });
     const [darkMode, setDarkMode] = useState(false);
     const [selectedMataKuliah, setSelectedMataKuliah] = useState(filters.mata_kuliah_id?.toString() || '');
     const [selectedKelas, setSelectedKelas] = useState(filters.kelas_id?.toString() || '');
@@ -80,14 +85,14 @@ export default function NilaiRekap({ rekapNilai, mataKuliahList, kelasList, filt
     };
 
     // Calculate statistics
-    const totalMahasiswa = rekapNilai.length;
-    const avgNilaiAkhir = totalMahasiswa > 0
-        ? rekapNilai.reduce((sum, item) => sum + item.nilai_akhir_avg, 0) / totalMahasiswa
+    const totalMahasiswa = rekapNilai?.length || 0;
+    const avgNilaiAkhir = totalMahasiswa > 0 && rekapNilai
+        ? rekapNilai.reduce((sum, item) => sum + Number(item.nilai_akhir_avg), 0) / totalMahasiswa
         : 0;
-    const gradeDistribution = rekapNilai.reduce((acc, item) => {
+    const gradeDistribution = rekapNilai?.reduce((acc, item) => {
         acc[item.grade_terbanyak] = (acc[item.grade_terbanyak] || 0) + 1;
         return acc;
-    }, {} as Record<string, number>);
+    }, {} as Record<string, number>) || {};
 
     return (
         <div className={darkMode ? 'dark' : ''}>
@@ -183,7 +188,7 @@ export default function NilaiRekap({ rekapNilai, mataKuliahList, kelasList, filt
                                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                     >
                                         <option value="">Semua Mata Kuliah</option>
-                                        {mataKuliahList.map((mk) => (
+                                        {mataKuliahList && mataKuliahList.map((mk) => (
                                             <option key={mk.id} value={mk.id}>
                                                 {mk.kode_mk} - {mk.nama_mk}
                                             </option>
@@ -202,7 +207,7 @@ export default function NilaiRekap({ rekapNilai, mataKuliahList, kelasList, filt
                                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                     >
                                         <option value="">Semua Kelas</option>
-                                        {kelasList.map((kelas) => (
+                                        {kelasList && kelasList.map((kelas) => (
                                             <option key={kelas.id} value={kelas.id}>
                                                 {kelas.nama_kelas}
                                             </option>
@@ -269,7 +274,7 @@ export default function NilaiRekap({ rekapNilai, mataKuliahList, kelasList, filt
 
                         {/* Rekap Table */}
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                            <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600">
+                            <div className="px-6 py-4 bg-linear-to-r from-blue-600 to-purple-600">
                                 <h3 className="text-lg font-semibold text-white">
                                     Rekap Nilai per Mahasiswa
                                 </h3>
@@ -309,7 +314,7 @@ export default function NilaiRekap({ rekapNilai, mataKuliahList, kelasList, filt
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                        {rekapNilai.length > 0 ? (
+                                        {rekapNilai && rekapNilai.length > 0 ? (
                                             rekapNilai.map((item, index) => (
                                                 <tr key={item.mahasiswa_id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                                                     <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
@@ -330,16 +335,16 @@ export default function NilaiRekap({ rekapNilai, mataKuliahList, kelasList, filt
                                                         {item.jumlah_mk}
                                                     </td>
                                                     <td className="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white">
-                                                        {item.tugas_avg.toFixed(2)}
+                                                        {Number(item.tugas_avg).toFixed(2)}
                                                     </td>
                                                     <td className="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white">
-                                                        {item.uts_avg.toFixed(2)}
+                                                        {Number(item.uts_avg).toFixed(2)}
                                                     </td>
                                                     <td className="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white">
-                                                        {item.uas_avg.toFixed(2)}
+                                                        {Number(item.uas_avg).toFixed(2)}
                                                     </td>
-                                                    <td className={`px-6 py-4 text-center text-sm font-bold ${getPerformanceColor(item.nilai_akhir_avg)}`}>
-                                                        {item.nilai_akhir_avg.toFixed(2)}
+                                                    <td className={`px-6 py-4 text-center text-sm font-bold ${getPerformanceColor(Number(item.nilai_akhir_avg))}`}>
+                                                        {Number(item.nilai_akhir_avg).toFixed(2)}
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
                                                         <span className={`px-3 py-1 rounded-full text-sm font-bold ${getGradeBadge(item.grade_terbanyak)}`}>

@@ -29,12 +29,17 @@ interface FormData {
 }
 
 interface Props {
-    mataKuliahList: any[];
-    kelasList: any[];
+    mataKuliahList?: any[];
+    kelasList?: any[];
 }
 
-export default function NilaiCreate({ mataKuliahList, kelasList }: Props) {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+export default function NilaiCreate({ mataKuliahList = [], kelasList = [] }: Props) {
+    const [sidebarOpen, setSidebarOpen] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 1024;
+        }
+        return true;
+    });
     const [darkMode, setDarkMode] = useState(false);
     const [mahasiswaList, setMahasiswaList] = useState<Mahasiswa[]>([]);
     const [loading, setLoading] = useState(false);
@@ -71,7 +76,7 @@ export default function NilaiCreate({ mataKuliahList, kelasList }: Props) {
                     mata_kuliah_id: formData.mata_kuliah_id,
                 },
             });
-            const mahasiswaData = response.data.data;
+            const mahasiswaData = response.data?.mahasiswa || response.data?.data || [];
             setMahasiswaList(mahasiswaData);
 
             // Initialize nilai for each mahasiswa
@@ -84,6 +89,8 @@ export default function NilaiCreate({ mataKuliahList, kelasList }: Props) {
             setFormData(prev => ({ ...prev, nilai: initialNilai }));
         } catch (error: any) {
             console.error('Error loading mahasiswa:', error);
+            setMahasiswaList([]);
+            setFormData(prev => ({ ...prev, nilai: [] }));
             alert(error.response?.data?.message || 'Gagal memuat data mahasiswa');
         } finally {
             setLoading(false);
@@ -199,7 +206,7 @@ export default function NilaiCreate({ mataKuliahList, kelasList }: Props) {
                                             required
                                         >
                                             <option value="">Pilih Mata Kuliah</option>
-                                            {mataKuliahList.map((mk) => (
+                                        {mataKuliahList && mataKuliahList.map((mk) => (
                                                 <option key={mk.id} value={mk.id}>
                                                     {mk.kode_mk} - {mk.nama_mk}
                                                 </option>
@@ -222,7 +229,7 @@ export default function NilaiCreate({ mataKuliahList, kelasList }: Props) {
                                             required
                                         >
                                             <option value="">Pilih Kelas</option>
-                                            {kelasList.map((kelas) => (
+                                            {kelasList && kelasList.map((kelas) => (
                                                 <option key={kelas.id} value={kelas.id}>
                                                     {kelas.nama_kelas}
                                                 </option>
@@ -280,9 +287,9 @@ export default function NilaiCreate({ mataKuliahList, kelasList }: Props) {
                             )}
 
                             {/* Student List */}
-                            {!loading && mahasiswaList.length > 0 && (
+                            {!loading && mahasiswaList && mahasiswaList.length > 0 && (
                                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                                    <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600">
+                                    <div className="px-6 py-4 bg-linear-to-r from-blue-600 to-purple-600">
                                         <h3 className="text-lg font-semibold text-white">
                                             Daftar Mahasiswa ({mahasiswaList.length} orang)
                                         </h3>
@@ -402,7 +409,7 @@ export default function NilaiCreate({ mataKuliahList, kelasList }: Props) {
                                         </button>
                                         <button
                                             type="submit"
-                                            className="px-8 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold shadow-lg transition"
+                                            className="px-8 py-2 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold shadow-lg transition"
                                         >
                                             Simpan Nilai
                                         </button>

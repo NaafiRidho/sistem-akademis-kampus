@@ -74,8 +74,8 @@ class NilaiController extends Controller
                     'id' => $item->mahasiswa->id,
                     'nim' => $item->mahasiswa->nim,
                     'nama' => $item->mahasiswa->nama,
-                    'kelas' => $item->mahasiswa->kelas->nama_kelas,
-                    'prodi' => $item->mahasiswa->prodi->nama_prodi,
+                    'kelas' => $item->mahasiswa->kelas ? $item->mahasiswa->kelas->nama_kelas : 'Belum Ada Kelas',
+                    'prodi' => $item->mahasiswa->prodi ? $item->mahasiswa->prodi->nama_prodi : 'Belum Ada Prodi',
                 ],
                 'mata_kuliah' => [
                     'id' => $item->mataKuliah->id,
@@ -415,25 +415,31 @@ class NilaiController extends Controller
                         ->where('tahun_ajaran', $tahunAjaran)
                         ->get();
 
-                    $totalSks = 0;
-                    $totalNilai = 0;
-
-                    foreach ($nilaiList as $n) {
-                        $mk = MataKuliah::find($n->mata_kuliah_id);
-                        $totalSks += $mk->sks;
-                        $totalNilai += ($n->nilai_akhir * $mk->sks);
-                    }
-
-                    $ips = $totalSks > 0 ? round($totalNilai / $totalSks, 2) : 0;
+                    $totalNilai = $nilaiList->count();
+                    
+                    // Calculate averages
+                    $tugasAvg = $totalNilai > 0 ? $nilaiList->avg('tugas') : 0;
+                    $utsAvg = $totalNilai > 0 ? $nilaiList->avg('uts') : 0;
+                    $uasAvg = $totalNilai > 0 ? $nilaiList->avg('uas') : 0;
+                    $nilaiAkhirAvg = $totalNilai > 0 ? $nilaiList->avg('nilai_akhir') : 0;
+                    
+                    // Get most common grade
+                    $grades = $nilaiList->pluck('grade')->toArray();
+                    $gradeCount = array_count_values($grades);
+                    arsort($gradeCount);
+                    $gradeTerbanyak = !empty($gradeCount) ? array_key_first($gradeCount) : '-';
 
                     return [
-                        'id' => $mhs->id,
+                        'mahasiswa_id' => $mhs->id,
                         'nim' => $mhs->nim,
                         'nama' => $mhs->nama,
-                        'kelas' => $mhs->kelas->nama_kelas,
-                        'prodi' => $mhs->prodi->nama_prodi,
-                        'total_mk' => $nilaiList->count(),
-                        'ips' => $ips,
+                        'kelas' => $mhs->kelas->nama_kelas ?? '-',
+                        'tugas_avg' => round($tugasAvg, 2),
+                        'uts_avg' => round($utsAvg, 2),
+                        'uas_avg' => round($uasAvg, 2),
+                        'nilai_akhir_avg' => round($nilaiAkhirAvg, 2),
+                        'grade_terbanyak' => $gradeTerbanyak,
+                        'jumlah_mk' => $totalNilai,
                     ];
                 }
             });
@@ -448,7 +454,7 @@ class NilaiController extends Controller
 
         return Inertia::render('Dosen/Nilai/Rekap', [
             'dosen' => $dosen,
-            'mahasiswaList' => $mahasiswaList,
+            'rekapNilai' => $mahasiswaList,
             'mataKuliahList' => $mataKuliahList,
             'kelasList' => $kelasList,
             'filters' => [
