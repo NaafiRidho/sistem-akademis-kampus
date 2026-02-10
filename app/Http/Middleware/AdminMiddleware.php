@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class AdminMiddleware
 {
@@ -34,12 +35,34 @@ class AdminMiddleware
                 return redirect('/login');
             }
 
-            if ($user->role->name !== 'admin') {
+            // Check role exists and is admin
+            if (!$user->role || $user->role->name !== 'admin') {
                 abort(403, 'Unauthorized - Admin access only');
             }
 
             return $next($request);
             
+        } catch (TokenExpiredException $e) {
+            // Token expired, try to refresh automatically
+            try {
+                $newToken = JWTAuth::refresh(JWTAuth::getToken());
+                session()->put('jwt_token', $newToken);
+                JWTAuth::setToken($newToken);
+                
+                // Continue with refreshed token
+                $user = JWTAuth::authenticate();
+                
+                if (!$user || !$user->role || $user->role->name !== 'admin') {
+                    session()->flush();
+                    return redirect('/login')->with('info', 'Sesi berakhir, silakan login kembali');
+                }
+                
+                return $next($request);
+            } catch (JWTException $refreshException) {
+                // Cannot refresh, redirect to login
+                session()->flush();
+                return redirect('/login')->with('info', 'Sesi berakhir, silakan login kembali');
+            }
         } catch (JWTException $e) {
             session()->flush();
             return redirect('/login');

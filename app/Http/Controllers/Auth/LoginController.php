@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -27,7 +28,16 @@ class LoginController extends Controller
             ])->onlyInput('email');
         }
 
+        /** @var User $user */
         $user = auth('api')->user();
+        $user->load('role'); // Eager load role
+        
+        // Validate role exists
+        if (!$user->role) {
+            return back()->withErrors([
+                'email' => 'Role pengguna tidak valid. Hubungi administrator.',
+            ])->onlyInput('email');
+        }
         
         // Store token and user in session
         $request->session()->put('jwt_token', $token);
