@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Log;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -38,7 +37,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = null;
-        
+
         // Try to get user from JWT token in session
         try {
             $token = session('jwt_token');
@@ -52,14 +51,9 @@ class HandleInertiaRequests extends Middleware
 
         $flash = [
             'success' => $request->session()->get('success'),
-            'error' => $request->session()->get('error'),
+            'error'   => $request->session()->get('error'),
             'import_errors' => $request->session()->get('import_errors'),
         ];
-        
-        // Debug log
-        if ($flash['success'] || $flash['error']) {
-            Log::info('Flash messages in middleware:', $flash);
-        }
 
         return [
             ...parent::share($request),

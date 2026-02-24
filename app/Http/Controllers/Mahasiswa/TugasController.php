@@ -164,14 +164,12 @@ class TugasController extends Controller
         $filename = Str::slug($mahasiswa->nim . '-' . $tugas->judul) . '-' . time() . '.' . $file->getClientOriginalExtension();
         $filePath = $file->storeAs('pengumpulan_tugas', $filename, 'public');
 
-        // Create pengumpulan
+        // Create pengumpulan (waktu_pengumpulan di-set otomatis via useCurrent() di database)
         PengumpulanTugas::create([
             'tugas_id' => $tugas->id,
             'mahasiswa_id' => $mahasiswa->id,
             'file_path' => $filePath,
             'catatan' => $request->catatan,
-            'tanggal_pengumpulan' => now(),
-            'status' => now() > $tugas->deadline ? 'Terlambat' : 'Tepat Waktu',
         ]);
 
         return redirect()->route('mahasiswa.tugas.show', $id)
@@ -198,11 +196,11 @@ class TugasController extends Controller
             abort(403, 'Anda tidak memiliki akses ke tugas ini');
         }
 
-        if (!$tugas->file_path || !Storage::exists($tugas->file_path)) {
+        if (!$tugas->file_path || !Storage::disk('public')->exists($tugas->file_path)) {
             return back()->with('error', 'File tidak ditemukan');
         }
 
-        return Storage::download($tugas->file_path, $tugas->judul . '.' . pathinfo($tugas->file_path, PATHINFO_EXTENSION));
+        return Storage::disk('public')->download($tugas->file_path, $tugas->judul . '.' . pathinfo($tugas->file_path, PATHINFO_EXTENSION));
     }
 
     public function downloadPengumpulan($id)
@@ -218,10 +216,10 @@ class TugasController extends Controller
             ->where('mahasiswa_id', $mahasiswa->id)
             ->firstOrFail();
 
-        if (!$pengumpulan->file_path || !Storage::exists($pengumpulan->file_path)) {
+        if (!$pengumpulan->file_path || !Storage::disk('public')->exists($pengumpulan->file_path)) {
             return back()->with('error', 'File tidak ditemukan');
         }
 
-        return Storage::download($pengumpulan->file_path);
+        return Storage::disk('public')->download($pengumpulan->file_path);
     }
 }

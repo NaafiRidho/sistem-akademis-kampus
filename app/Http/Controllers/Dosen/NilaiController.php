@@ -41,7 +41,7 @@ class NilaiController extends Controller
 
         // Filter by kelas
         if ($request->filled('kelas_id')) {
-            $query->whereHas('mahasiswa', function($q) use ($request) {
+            $query->whereHas('mahasiswa', function ($q) use ($request) {
                 $q->where('kelas_id', $request->kelas_id);
             });
         }
@@ -58,16 +58,16 @@ class NilaiController extends Controller
         // Search mahasiswa
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('mahasiswa', function($q) use ($search) {
+            $query->whereHas('mahasiswa', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nim', 'like', "%{$search}%");
+                    ->orWhere('nim', 'like', "%{$search}%");
             });
         }
 
         $nilai = $query->orderBy('created_at', 'desc')->paginate(15);
 
         // Transform data
-        $nilai->getCollection()->transform(function($item) {
+        $nilai->getCollection()->transform(function ($item) {
             return [
                 'id' => $item->id,
                 'mahasiswa' => [
@@ -155,7 +155,7 @@ class NilaiController extends Controller
         $mahasiswa = Mahasiswa::where('kelas_id', $kelasId)
             ->orderBy('nim')
             ->get()
-            ->map(function($mhs) use ($mataKuliahId, $semester, $tahunAjaran) {
+            ->map(function ($mhs) use ($mataKuliahId, $semester, $tahunAjaran) {
                 // Cek apakah sudah ada nilai
                 $existingNilai = Nilai::where('mahasiswa_id', $mhs->id)
                     ->where('mata_kuliah_id', $mataKuliahId)
@@ -202,9 +202,9 @@ class NilaiController extends Controller
                 $tugas = $data['tugas'] ?? 0;
                 $uts = $data['uts'] ?? 0;
                 $uas = $data['uas'] ?? 0;
-                
+
                 $nilaiAkhir = ($tugas * 0.3) + ($uts * 0.3) + ($uas * 0.4);
-                
+
                 // Tentukan grade
                 $grade = $this->calculateGrade($nilaiAkhir);
 
@@ -312,7 +312,7 @@ class NilaiController extends Controller
         $tugas = $request->tugas ?? 0;
         $uts = $request->uts ?? 0;
         $uas = $request->uas ?? 0;
-        
+
         $nilaiAkhir = ($tugas * 0.3) + ($uts * 0.3) + ($uas * 0.4);
         $grade = $this->calculateGrade($nilaiAkhir);
 
@@ -386,7 +386,7 @@ class NilaiController extends Controller
         $mahasiswaList = $query->with(['prodi', 'kelas'])
             ->orderBy('nim')
             ->get()
-            ->map(function($mhs) use ($mataKuliahId, $semester, $tahunAjaran, $mataKuliahIds) {
+            ->map(function ($mhs) use ($mataKuliahId, $semester, $tahunAjaran, $mataKuliahIds) {
                 if ($mataKuliahId) {
                     // Detail nilai untuk satu mata kuliah
                     $nilai = Nilai::where('mahasiswa_id', $mhs->id)
@@ -399,13 +399,13 @@ class NilaiController extends Controller
                         'id' => $mhs->id,
                         'nim' => $mhs->nim,
                         'nama' => $mhs->nama,
-                        'kelas' => $mhs->kelas->nama_kelas,
-                        'tugas' => $nilai->tugas ?? null,
-                        'uts' => $nilai->uts ?? null,
-                        'uas' => $nilai->uas ?? null,
-                        'nilai_akhir' => $nilai->nilai_akhir ?? null,
-                        'grade' => $nilai->grade ?? null,
-                        'nilai_id' => $nilai->id ?? null,
+                        'kelas' => $mhs->kelas ? $mhs->kelas->nama_kelas : '-',
+                        'tugas' => $nilai ? $nilai->tugas : null,
+                        'uts' => $nilai ? $nilai->uts : null,
+                        'uas' => $nilai ? $nilai->uas : null,
+                        'nilai_akhir' => $nilai ? $nilai->nilai_akhir : null,
+                        'grade' => $nilai ? $nilai->grade : null,
+                        'nilai_id' => $nilai ? $nilai->id : null,
                     ];
                 } else {
                     // Ringkasan semua nilai
@@ -416,13 +416,13 @@ class NilaiController extends Controller
                         ->get();
 
                     $totalNilai = $nilaiList->count();
-                    
+
                     // Calculate averages
                     $tugasAvg = $totalNilai > 0 ? $nilaiList->avg('tugas') : 0;
                     $utsAvg = $totalNilai > 0 ? $nilaiList->avg('uts') : 0;
                     $uasAvg = $totalNilai > 0 ? $nilaiList->avg('uas') : 0;
                     $nilaiAkhirAvg = $totalNilai > 0 ? $nilaiList->avg('nilai_akhir') : 0;
-                    
+
                     // Get most common grade
                     $grades = $nilaiList->pluck('grade')->toArray();
                     $gradeCount = array_count_values($grades);

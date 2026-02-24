@@ -45,16 +45,16 @@ class TugasController extends Controller
         // Hitung jumlah pengumpulan untuk setiap tugas
         $tugas->getCollection()->transform(function ($item) {
             $item->jumlah_pengumpulan = $item->pengumpulanTugas->count();
-            
+
             // Hitung mahasiswa yang belum mengumpulkan
             $kelasIds = Jadwal::where('dosen_id', $item->dosen_id)
                 ->where('mata_kuliah_id', $item->mata_kuliah_id)
                 ->pluck('kelas_id');
-            
+
             $totalMahasiswa = Mahasiswa::whereIn('kelas_id', $kelasIds)->count();
             $item->total_mahasiswa = $totalMahasiswa;
-            $item->belum_mengumpulkan = $totalMahasiswa - $item->jumlah_pengumpulan;
-            
+            $item->belum_mengumpulkan = max(0, $totalMahasiswa - $item->jumlah_pengumpulan);
+
             // Status deadline
             $now = now();
             if ($now->greaterThan($item->deadline)) {
@@ -64,7 +64,7 @@ class TugasController extends Controller
             } else {
                 $item->status_deadline = 'normal';
             }
-            
+
             return $item;
         });
 
@@ -72,10 +72,10 @@ class TugasController extends Controller
         $mataKuliahIds = Jadwal::where('dosen_id', $dosen->id)
             ->distinct()
             ->pluck('mata_kuliah_id');
-        
+
         $mataKuliahList = MataKuliah::whereIn('id', $mataKuliahIds)
             ->get()
-            ->map(function($mk) use ($dosen) {
+            ->map(function ($mk) use ($dosen) {
                 $kelasList = Jadwal::where('dosen_id', $dosen->id)
                     ->where('mata_kuliah_id', $mk->id)
                     ->with('kelas')
@@ -117,10 +117,10 @@ class TugasController extends Controller
         $mataKuliahIds = Jadwal::where('dosen_id', $dosen->id)
             ->distinct()
             ->pluck('mata_kuliah_id');
-        
+
         $mataKuliahList = MataKuliah::whereIn('id', $mataKuliahIds)
             ->get()
-            ->map(function($mk) use ($dosen) {
+            ->map(function ($mk) use ($dosen) {
                 $kelasList = Jadwal::where('dosen_id', $dosen->id)
                     ->where('mata_kuliah_id', $mk->id)
                     ->with('kelas')
@@ -210,10 +210,10 @@ class TugasController extends Controller
             ->with(['mahasiswa.prodi', 'mahasiswa.kelas'])
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function($item) use ($tugas) {
+            ->map(function ($item) use ($tugas) {
                 $waktuPengumpulan = \Carbon\Carbon::parse($item->waktu_pengumpulan ?? $item->created_at);
                 $deadline = \Carbon\Carbon::parse($tugas->deadline);
-                
+
                 return [
                     'id' => $item->id,
                     'mahasiswa' => [
@@ -226,8 +226,8 @@ class TugasController extends Controller
                     'file_path' => $item->file_path,
                     'waktu_pengumpulan' => $waktuPengumpulan->format('d M Y H:i'),
                     'status' => $waktuPengumpulan->lessThanOrEqualTo($deadline) ? 'Tepat Waktu' : 'Terlambat',
-                    'keterlambatan' => $waktuPengumpulan->greaterThan($deadline) 
-                        ? $deadline->diffForHumans($waktuPengumpulan, true) 
+                    'keterlambatan' => $waktuPengumpulan->greaterThan($deadline)
+                        ? $deadline->diffForHumans($waktuPengumpulan, true)
                         : null,
                     'nilai' => $item->nilai,
                     'catatan' => $item->catatan,
@@ -238,7 +238,7 @@ class TugasController extends Controller
         $kelasIds = Jadwal::where('dosen_id', $dosen->id)
             ->where('mata_kuliah_id', $tugas->mata_kuliah_id)
             ->pluck('kelas_id');
-        
+
         $totalMahasiswa = Mahasiswa::whereIn('kelas_id', $kelasIds)->count();
         $jumlahPengumpulan = $pengumpulan->count();
         $sudahDinilai = $pengumpulan->where('nilai', '!=', null)->count();
@@ -275,10 +275,10 @@ class TugasController extends Controller
         $mataKuliahIds = Jadwal::where('dosen_id', $dosen->id)
             ->distinct()
             ->pluck('mata_kuliah_id');
-        
+
         $mataKuliahList = MataKuliah::whereIn('id', $mataKuliahIds)
             ->get()
-            ->map(function($mk) use ($dosen) {
+            ->map(function ($mk) use ($dosen) {
                 $kelasList = Jadwal::where('dosen_id', $dosen->id)
                     ->where('mata_kuliah_id', $mk->id)
                     ->with('kelas')
@@ -416,7 +416,7 @@ class TugasController extends Controller
 
         $filePath = Storage::disk('public')->path($tugas->file_path);
         $fileName = basename($tugas->file_path);
-        
+
         return response()->download($filePath, $fileName);
     }
 
@@ -430,7 +430,7 @@ class TugasController extends Controller
         }
 
         $pengumpulan = PengumpulanTugas::where('id', $id)
-            ->whereHas('tugas', function($q) use ($dosen) {
+            ->whereHas('tugas', function ($q) use ($dosen) {
                 $q->where('dosen_id', $dosen->id);
             })
             ->firstOrFail();
@@ -441,7 +441,7 @@ class TugasController extends Controller
 
         $filePath = Storage::disk('public')->path($pengumpulan->file_path);
         $fileName = basename($pengumpulan->file_path);
-        
+
         return response()->download($filePath, $fileName);
     }
 
@@ -455,7 +455,7 @@ class TugasController extends Controller
         }
 
         $pengumpulan = PengumpulanTugas::where('id', $id)
-            ->whereHas('tugas', function($q) use ($dosen) {
+            ->whereHas('tugas', function ($q) use ($dosen) {
                 $q->where('dosen_id', $dosen->id);
             })
             ->firstOrFail();

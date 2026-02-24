@@ -51,7 +51,7 @@ class NilaiController extends Controller
         $nilai = $query->orderBy('created_at', 'desc')->paginate(15);
 
         // Transform data
-        $nilai->getCollection()->transform(function($item) {
+        $nilai->getCollection()->transform(function ($item) {
             return [
                 'id' => $item->id,
                 'mata_kuliah' => [
@@ -131,13 +131,13 @@ class NilaiController extends Controller
             ->get();
 
         // Group by semester & tahun ajaran
-        $transkrip = $nilaiList->groupBy(function($item) {
+        $transkrip = $nilaiList->groupBy(function ($item) {
             return $item->tahun_ajaran . ' - ' . $item->semester;
-        })->map(function($items, $key) {
+        })->map(function ($items, $key) {
             $totalSks = 0;
             $totalNilai = 0;
 
-            $nilaiItems = $items->map(function($item) use (&$totalSks, &$totalNilai) {
+            $nilaiItems = $items->map(function ($item) use (&$totalSks, &$totalNilai) {
                 $totalSks += $item->mataKuliah->sks;
                 $totalNilai += ($item->nilai_akhir * $item->mataKuliah->sks);
 
@@ -166,16 +166,17 @@ class NilaiController extends Controller
             ];
         })->values();
 
-        // Hitung IPK (keseluruhan)
-        $semuaNilai = Nilai::where('mahasiswa_id', $mahasiswa->id)->get();
+        // Hitung IPK (keseluruhan) - gunakan eager loading untuk hindari N+1 query
+        $semuaNilai = Nilai::where('mahasiswa_id', $mahasiswa->id)
+            ->with('mataKuliah')
+            ->get();
         $totalSksKeseluruhan = 0;
         $totalNilaiKeseluruhan = 0;
 
         foreach ($semuaNilai as $n) {
-            $mk = MataKuliah::find($n->mata_kuliah_id);
-            if ($mk) {
-                $totalSksKeseluruhan += $mk->sks;
-                $totalNilaiKeseluruhan += ($n->nilai_akhir * $mk->sks);
+            if ($n->mataKuliah) {
+                $totalSksKeseluruhan += $n->mataKuliah->sks;
+                $totalNilaiKeseluruhan += ($n->nilai_akhir * $n->mataKuliah->sks);
             }
         }
 

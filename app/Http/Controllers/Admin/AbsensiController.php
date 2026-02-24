@@ -20,14 +20,14 @@ class AbsensiController extends Controller
         // Search
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->whereHas('mahasiswa', function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('mahasiswa', function ($q) use ($search) {
                     $q->where('nama', 'like', "%{$search}%")
-                      ->orWhere('nim', 'like', "%{$search}%");
+                        ->orWhere('nim', 'like', "%{$search}%");
                 })
-                ->orWhereHas('jadwal.mataKuliah', function($q) use ($search) {
-                    $q->where('nama_mk', 'like', "%{$search}%");
-                });
+                    ->orWhereHas('jadwal.mataKuliah', function ($q) use ($search) {
+                        $q->where('nama_mk', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -47,9 +47,9 @@ class AbsensiController extends Controller
         }
 
         $absensi = $query->orderBy('tanggal', 'desc')->paginate(15);
-        
+
         // Transform data untuk frontend
-        $absensi->getCollection()->transform(function($item) {
+        $absensi->getCollection()->transform(function ($item) {
             return [
                 'id' => $item->id,
                 'mahasiswa_id' => $item->mahasiswa_id,
@@ -79,18 +79,18 @@ class AbsensiController extends Controller
                 ],
             ];
         });
-        
+
         // Transform mahasiswa data
-        $mahasiswa = Mahasiswa::with('prodi')->get()->map(function($item) {
+        $mahasiswa = Mahasiswa::with('prodi')->get()->map(function ($item) {
             return [
                 'id' => $item->id,
                 'nim' => $item->nim,
                 'nama' => $item->nama,
             ];
         });
-        
+
         // Transform jadwal data
-        $jadwal = Jadwal::with(['kelas', 'mataKuliah'])->get()->map(function($item) {
+        $jadwal = Jadwal::with(['kelas', 'mataKuliah'])->get()->map(function ($item) {
             return [
                 'id' => $item->id,
                 'hari' => $item->hari,
@@ -173,23 +173,30 @@ class AbsensiController extends Controller
 
             $imported = 0;
             $errors = [];
-            
+
             DB::beginTransaction();
-            
+
             foreach ($rows as $index => $row) {
                 if ($index === 0) continue;
-                
+
                 try {
                     $mahasiswa = Mahasiswa::where('nim', $row[0])->first();
                     $jadwal = Jadwal::find($row[1]);
-                    
+
                     if (!$mahasiswa) {
                         $errors[] = "Baris " . ($index + 1) . ": Mahasiswa NIM '{$row[0]}' tidak ditemukan";
                         continue;
                     }
-                    
+
                     if (!$jadwal) {
                         $errors[] = "Baris " . ($index + 1) . ": Jadwal ID '{$row[1]}' tidak ditemukan";
+                        continue;
+                    }
+
+                    // Validasi status
+                    $validStatuses = ['Hadir', 'Izin', 'Sakit', 'Alpa'];
+                    if (!in_array($row[3], $validStatuses)) {
+                        $errors[] = "Baris " . ($index + 1) . ": Status '{$row[3]}' tidak valid. Gunakan: Hadir, Izin, Sakit, atau Alpa";
                         continue;
                     }
 
@@ -200,15 +207,15 @@ class AbsensiController extends Controller
                         'status' => $row[3],
                         'keterangan' => $row[4] ?? null
                     ]);
-                    
+
                     $imported++;
                 } catch (\Exception $e) {
                     $errors[] = "Baris " . ($index + 1) . ": " . $e->getMessage();
                 }
             }
-            
+
             DB::commit();
-            
+
             $message = "Berhasil mengimpor {$imported} data absensi";
             if (!empty($errors)) {
                 return back()->with([
@@ -216,9 +223,8 @@ class AbsensiController extends Controller
                     'import_errors' => $errors
                 ]);
             }
-            
+
             return back()->with('success', $message);
-            
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
@@ -229,24 +235,24 @@ class AbsensiController extends Controller
     {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        
+
         $sheet->setCellValue('A1', 'NIM');
         $sheet->setCellValue('B1', 'Jadwal ID');
         $sheet->setCellValue('C1', 'Tanggal');
         $sheet->setCellValue('D1', 'Status');
         $sheet->setCellValue('E1', 'Keterangan');
-        
+
         $sheet->setCellValue('A2', '123456789');
         $sheet->setCellValue('B2', '1');
         $sheet->setCellValue('C2', date('Y-m-d'));
         $sheet->setCellValue('D2', 'Hadir');
         $sheet->setCellValue('E2', '');
-        
+
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $filename = 'template_absensi_' . date('YmdHis') . '.xlsx';
         $temp_file = tempnam(sys_get_temp_dir(), $filename);
         $writer->save($temp_file);
-        
+
         return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
     }
 
@@ -254,7 +260,7 @@ class AbsensiController extends Controller
     public function rekap(Request $request, $mahasiswaId)
     {
         $mahasiswa = Mahasiswa::with('prodi')->findOrFail($mahasiswaId);
-        
+
         $rekap = Absensi::where('mahasiswa_id', $mahasiswaId)
             ->selectRaw('
                 jadwal_id,

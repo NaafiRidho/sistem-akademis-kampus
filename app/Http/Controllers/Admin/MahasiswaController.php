@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class MahasiswaController extends Controller
@@ -22,9 +21,9 @@ class MahasiswaController extends Controller
         // Search functionality
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nim', 'like', "%{$search}%")
-                  ->orWhere('nama', 'like', "%{$search}%");
+                    ->orWhere('nama', 'like', "%{$search}%");
             });
         }
 
@@ -37,24 +36,11 @@ class MahasiswaController extends Controller
         $prodis = Prodi::with('fakultas')->get();
         $kelas = \App\Models\Kelas::with('prodi')->orderBy('nama_kelas')->get();
 
-        // Log untuk debugging di production (bisa dihapus setelah fix)
-        Log::info('Mahasiswa Controller - Data Count', [
-            'mahasiswa_count' => $mahasiswa->total(),
-            'prodis_count' => $prodis->count(),
-            'kelas_count' => $kelas->count(),
-            'kelas_sample' => $kelas->take(3)->map(fn($k) => [
-                'id' => $k->id,
-                'nama' => $k->nama_kelas,
-                'prodi_id' => $k->prodi_id,
-                'prodi_id_type' => gettype($k->prodi_id)
-            ])
-        ]);
-
         return Inertia::render('Admin/Mahasiswa/Index', [
             'mahasiswa' => $mahasiswa,
-            'prodis' => $prodis,
-            'kelas' => $kelas ?? [], // Fallback ke array kosong
-            'filters' => $request->only(['search', 'prodi_id'])
+            'prodis'    => $prodis,
+            'kelas'     => $kelas ?? [],
+            'filters'   => $request->only(['search', 'prodi_id'])
         ]);
     }
 
@@ -81,10 +67,10 @@ class MahasiswaController extends Controller
         try {
             // Create user account
             $user = User::create([
-                'name' => $validated['nama'],
-                'email' => $validated['email'],
+                'name'     => $validated['nama'],
+                'email'    => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role_id' => 3 // Mahasiswa role
+                'role_id'  => \App\Models\Role::where('name', 'mahasiswa')->value('id'),
             ]);
 
             // Create mahasiswa record
@@ -118,15 +104,15 @@ class MahasiswaController extends Controller
         $mahasiswa = Mahasiswa::findOrFail($id);
 
         $validated = $request->validate([
-            'nim' => 'required|unique:mahasiswa,nim,' . $id,
-            'nama' => 'required|string|max:255',
-            'prodi_id' => 'required|exists:prodi,id',
-            'kelas_id' => 'nullable|exists:kelas,id',
-            'angkatan' => 'required|integer|min:2000|max:' . (date('Y') + 1),
+            'nim'           => 'required|unique:mahasiswa,nim,' . $id,
+            'nama'          => 'required|string|max:255',
+            'prodi_id'      => 'required|exists:prodi,id',
+            'kelas_id'      => 'nullable|exists:kelas,id',
+            'angkatan'      => 'required|integer|min:2000|max:' . (date('Y') + 1),
             'jenis_kelamin' => 'required|in:L,P',
-            'alamat' => 'nullable|string',
-            'email' => 'required|email|unique:users,email,' . $mahasiswa->user_id,
-            'password' => 'nullable|min:8'
+            'alamat'        => 'nullable|string',
+            'email'         => 'required|email|unique:users,email,' . $mahasiswa->user->id,
+            'password'      => 'nullable|min:8'
         ]);
 
         DB::beginTransaction();
@@ -169,7 +155,7 @@ class MahasiswaController extends Controller
         try {
             $mahasiswa = Mahasiswa::findOrFail($id);
             $userId = $mahasiswa->user_id;
-            
+
             $mahasiswa->delete();
             User::find($userId)->delete();
 
@@ -186,21 +172,21 @@ class MahasiswaController extends Controller
     {
         Log::info('Import request received');
         Log::info('Has file: ' . ($request->hasFile('file') ? 'yes' : 'no'));
-        
+
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             Log::info('File details - Name: ' . $file->getClientOriginalName() . ', Extension: ' . $file->getClientOriginalExtension() . ', MIME: ' . $file->getMimeType());
         }
-        
+
         try {
             $request->validate([
                 'file' => 'required|file|max:10240'
             ]);
-            
+
             // Manual validation for file extension
             $file = $request->file('file');
             $extension = strtolower($file->getClientOriginalExtension());
-            
+
             if (!in_array($extension, ['xlsx', 'xls', 'csv'])) {
                 return back()->with('error', 'File harus berformat Excel (.xlsx, .xls) atau CSV (.csv). File Anda: .' . $extension);
             }
@@ -212,7 +198,7 @@ class MahasiswaController extends Controller
         try {
             $file = $request->file('file');
             Log::info('Import file received: ' . $file->getClientOriginalName());
-            
+
             $spreadsheet = IOFactory::load($file->getRealPath());
             $sheet = $spreadsheet->getActiveSheet();
             $rows = $sheet->toArray();
@@ -236,7 +222,7 @@ class MahasiswaController extends Controller
             foreach ($rows as $index => $row) {
                 try {
                     Log::info("Processing row " . ($index + 2) . ": " . json_encode($row));
-                    
+
                     // Skip completely empty rows
                     if (empty(array_filter($row))) {
                         Log::info("Skipping empty row " . ($index + 2));
@@ -278,10 +264,10 @@ class MahasiswaController extends Controller
 
                     // Create user
                     $user = User::create([
-                        'name' => $row[1],
-                        'email' => $email,
+                        'name'     => $row[1],
+                        'email'    => $email,
                         'password' => Hash::make($row[6] ?? '12345678'),
-                        'role_id' => 3
+                        'role_id'  => \App\Models\Role::where('name', 'mahasiswa')->value('id'),
                     ]);
 
                     // Create mahasiswa
@@ -327,7 +313,6 @@ class MahasiswaController extends Controller
                     'success' => $message,
                     'import_errors' => $errors
                 ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('admin.mahasiswa.index')
@@ -344,7 +329,7 @@ class MahasiswaController extends Controller
 
         $columns = ['NIM', 'Nama', 'Prodi ID', 'Angkatan', 'Jenis Kelamin (L/P)', 'Email', 'Password', 'Alamat', 'Kelas ID'];
 
-        $callback = function() use ($columns) {
+        $callback = function () use ($columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
             fputcsv($file, ['2024001', 'John Doe', '1', '2024', 'L', 'john@student.ac.id', '12345678', 'Jl. Example No. 1', '1']);
