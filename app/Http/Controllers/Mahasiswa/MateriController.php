@@ -8,14 +8,13 @@ use App\Models\Materi;
 use App\Models\Jadwal;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Storage;
 
 class MateriController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -64,7 +63,7 @@ class MateriController extends Controller
 
     public function download($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {

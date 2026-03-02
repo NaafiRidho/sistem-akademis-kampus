@@ -7,14 +7,13 @@ use App\Models\Jadwal;
 use App\Models\Dosen;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Carbon\Carbon;
 
 class JadwalController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -40,7 +39,7 @@ class JadwalController extends Controller
                 // Filter minggu ini berdasarkan range tanggal
                 $startOfWeek = $currentDate->copy()->startOfWeek();
                 $endOfWeek = $currentDate->copy()->endOfWeek();
-                
+
                 // Karena jadwal menggunakan nama hari, kita ambil semua jadwal
                 // dan filter di collection
                 break;
@@ -66,7 +65,7 @@ class JadwalController extends Controller
         ];
 
         // Sort jadwal berdasarkan hari
-        $jadwal = $jadwal->sortBy(function($item) use ($hariOrder) {
+        $jadwal = $jadwal->sortBy(function ($item) use ($hariOrder) {
             return $hariOrder[$item->hari] ?? 999;
         })->values();
 
@@ -74,7 +73,7 @@ class JadwalController extends Controller
         $jadwalGrouped = $jadwal->groupBy('hari');
 
         // Transform data untuk frontend
-        $jadwalTransformed = $jadwal->map(function($item) {
+        $jadwalTransformed = $jadwal->map(function ($item) {
             return [
                 'id' => $item->id,
                 'hari' => $item->hari,
@@ -99,9 +98,9 @@ class JadwalController extends Controller
         // Get statistik
         $totalMataKuliah = $jadwal->unique('mata_kuliah_id')->count();
         $totalKelas = $jadwal->unique('kelas_id')->count();
-        
+
         // Hitung total jam mengajar per minggu
-        $totalJamMinggu = $jadwal->sum(function($item) {
+        $totalJamMinggu = $jadwal->sum(function ($item) {
             $start = Carbon::parse($item->jam_mulai);
             $end = Carbon::parse($item->jam_selesai);
             // Gunakan diffInMinutes lalu konversi ke jam dengan pembulatan 1 desimal

@@ -13,13 +13,12 @@ use App\Models\PengumpulanTugas;
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)
             ->with(['prodi.fakultas', 'kelas'])
             ->first();
@@ -38,11 +37,11 @@ class DashboardController extends Controller
 
         // Get tugas yang belum dikumpulkan
         $kelasIds = [$mahasiswa->kelas_id];
-        $tugasAktif = Tugas::whereHas('mataKuliah.jadwal', function($query) use ($kelasIds) {
-                $query->whereIn('kelas_id', $kelasIds);
-            })
+        $tugasAktif = Tugas::whereHas('mataKuliah.jadwal', function ($query) use ($kelasIds) {
+            $query->whereIn('kelas_id', $kelasIds);
+        })
             ->where('deadline', '>=', now())
-            ->whereDoesntHave('pengumpulanTugas', function($query) use ($mahasiswa) {
+            ->whereDoesntHave('pengumpulanTugas', function ($query) use ($mahasiswa) {
                 $query->where('mahasiswa_id', $mahasiswa->id);
             })
             ->with(['mataKuliah', 'dosen'])
@@ -56,7 +55,7 @@ class DashboardController extends Controller
         $sakit = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Sakit')->count();
         $izin = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Izin')->count();
         $alpha = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Alpha')->count();
-        
+
         $persentaseKehadiran = $totalAbsensi > 0 ? round(($hadir / $totalAbsensi) * 100, 2) : 0;
 
         // Statistik nilai
@@ -74,7 +73,7 @@ class DashboardController extends Controller
 
         // Count unread announcements
         $unreadPengumumanCount = Pengumuman::whereIn('target_role', ['Mahasiswa', 'Semua'])
-            ->whereDoesntHave('readers', function($query) use ($user) {
+            ->whereDoesntHave('readers', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
             ->count();

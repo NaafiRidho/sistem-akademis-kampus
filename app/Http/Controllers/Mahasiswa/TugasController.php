@@ -9,7 +9,6 @@ use App\Models\PengumpulanTugas;
 use App\Models\Jadwal;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -17,7 +16,7 @@ class TugasController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -36,11 +35,11 @@ class TugasController extends Controller
         // Filter by status
         if ($request->filled('status')) {
             if ($request->status === 'belum_dikumpulkan') {
-                $query->whereDoesntHave('pengumpulanTugas', function($q) use ($mahasiswa) {
+                $query->whereDoesntHave('pengumpulanTugas', function ($q) use ($mahasiswa) {
                     $q->where('mahasiswa_id', $mahasiswa->id);
                 });
             } elseif ($request->status === 'sudah_dikumpulkan') {
-                $query->whereHas('pengumpulanTugas', function($q) use ($mahasiswa) {
+                $query->whereHas('pengumpulanTugas', function ($q) use ($mahasiswa) {
                     $q->where('mahasiswa_id', $mahasiswa->id);
                 });
             }
@@ -67,7 +66,7 @@ class TugasController extends Controller
             $item->pengumpulan = $pengumpulan;
             $item->status_pengumpulan = $pengumpulan ? 'Sudah Dikumpulkan' : 'Belum Dikumpulkan';
             $item->is_terlambat = !$pengumpulan && now() > $item->deadline;
-            
+
             return $item;
         });
 
@@ -93,7 +92,7 @@ class TugasController extends Controller
 
     public function show($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -127,7 +126,7 @@ class TugasController extends Controller
 
     public function submit(Request $request, $id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -178,7 +177,7 @@ class TugasController extends Controller
 
     public function download($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -200,12 +199,12 @@ class TugasController extends Controller
             return back()->with('error', 'File tidak ditemukan');
         }
 
-        return Storage::disk('public')->download($tugas->file_path, $tugas->judul . '.' . pathinfo($tugas->file_path, PATHINFO_EXTENSION));
+        return response()->download(storage_path('app/public/' . $tugas->file_path), $tugas->judul . '.' . pathinfo($tugas->file_path, PATHINFO_EXTENSION));
     }
 
     public function downloadPengumpulan($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -220,6 +219,6 @@ class TugasController extends Controller
             return back()->with('error', 'File tidak ditemukan');
         }
 
-        return Storage::disk('public')->download($pengumpulan->file_path);
+        return response()->download(storage_path('app/public/' . $pengumpulan->file_path));
     }
 }

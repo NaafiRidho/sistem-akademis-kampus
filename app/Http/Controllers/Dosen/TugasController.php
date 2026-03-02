@@ -11,7 +11,6 @@ use App\Models\PengumpulanTugas;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +18,7 @@ class TugasController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -106,7 +105,7 @@ class TugasController extends Controller
 
     public function create()
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -147,7 +146,7 @@ class TugasController extends Controller
 
     public function store(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -193,7 +192,7 @@ class TugasController extends Controller
 
     public function show($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -259,7 +258,7 @@ class TugasController extends Controller
 
     public function edit($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -306,7 +305,7 @@ class TugasController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -360,7 +359,7 @@ class TugasController extends Controller
 
     public function destroy($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -399,7 +398,7 @@ class TugasController extends Controller
 
     public function download($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -422,7 +421,7 @@ class TugasController extends Controller
 
     public function downloadPengumpulan($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -447,7 +446,7 @@ class TugasController extends Controller
 
     public function nilai(Request $request, $id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {

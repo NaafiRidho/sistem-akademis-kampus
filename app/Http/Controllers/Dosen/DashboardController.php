@@ -11,13 +11,12 @@ use App\Models\MataKuliah;
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->with('prodi')->first();
 
         if (!$dosen) {
@@ -50,7 +49,7 @@ class DashboardController extends Controller
             ->get();
 
         // Transform jadwal untuk frontend
-        $jadwalTransformed = $jadwalHariIni->map(function($item) {
+        $jadwalTransformed = $jadwalHariIni->map(function ($item) {
             return [
                 'id' => $item->id,
                 'hari' => $item->hari,
@@ -71,14 +70,14 @@ class DashboardController extends Controller
         });
 
         // Get recent activities
-        $recentNilai = Nilai::whereHas('mataKuliah.jadwal', function($q) use ($dosen) {
-                $q->where('dosen_id', $dosen->id);
-            })
+        $recentNilai = Nilai::whereHas('mataKuliah.jadwal', function ($q) use ($dosen) {
+            $q->where('dosen_id', $dosen->id);
+        })
             ->with(['mahasiswa', 'mataKuliah'])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function($item) {
+            ->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'nilai' => $item->nilai,
@@ -98,7 +97,7 @@ class DashboardController extends Controller
 
         // Count unread announcements
         $unreadPengumumanCount = Pengumuman::whereIn('target_role', ['Dosen', 'Semua'])
-            ->whereDoesntHave('readers', function($query) use ($user) {
+            ->whereDoesntHave('readers', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
             ->count();

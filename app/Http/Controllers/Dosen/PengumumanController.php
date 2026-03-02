@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class PengumumanController extends Controller
 {
@@ -15,23 +14,23 @@ class PengumumanController extends Controller
      */
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
-        
+        $user = auth('api')->user();
+
         $query = Pengumuman::query()
             ->whereIn('target_role', ['Dosen', 'Semua']);
 
         // Search
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('isi', 'like', "%{$search}%");
+                    ->orWhere('isi', 'like', "%{$search}%");
             });
         }
 
         // Filter: unread only
         if ($request->has('unread') && $request->unread == 'true') {
-            $query->whereDoesntHave('readers', function($q) use ($user) {
+            $query->whereDoesntHave('readers', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
@@ -48,7 +47,7 @@ class PengumumanController extends Controller
 
         // Count unread announcements
         $unreadCount = Pengumuman::whereIn('target_role', ['Dosen', 'Semua'])
-            ->whereDoesntHave('readers', function($q) use ($user) {
+            ->whereDoesntHave('readers', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
             ->count();
@@ -68,7 +67,7 @@ class PengumumanController extends Controller
      */
     public function show(string $id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $pengumuman = Pengumuman::findOrFail($id);
 
         // Mark as read
@@ -84,9 +83,9 @@ class PengumumanController extends Controller
      */
     public function markAsRead(string $id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $pengumuman = Pengumuman::findOrFail($id);
-        
+
         $pengumuman->markAsReadBy($user);
 
         return response()->json([

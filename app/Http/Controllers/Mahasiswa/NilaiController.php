@@ -9,13 +9,12 @@ use App\Models\MataKuliah;
 use App\Models\Jadwal;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class NilaiController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)
             ->with(['prodi', 'kelas'])
             ->first();
@@ -101,7 +100,7 @@ class NilaiController extends Controller
 
     public function transkrip(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)
             ->with(['prodi', 'kelas'])
             ->first();

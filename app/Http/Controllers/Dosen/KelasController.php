@@ -9,13 +9,12 @@ use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class KelasController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -33,9 +32,9 @@ class KelasController extends Controller
         // Search functionality
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nama_kelas', 'like', "%{$search}%")
-                  ->orWhere('tahun_ajaran', 'like', "%{$search}%");
+                    ->orWhere('tahun_ajaran', 'like', "%{$search}%");
             });
         }
 
@@ -47,7 +46,7 @@ class KelasController extends Controller
         $kelas = $query->get();
 
         // Tambahkan informasi mata kuliah dan jumlah mahasiswa per kelas
-        $kelas = $kelas->map(function($item) use ($dosen) {
+        $kelas = $kelas->map(function ($item) use ($dosen) {
             // Get mata kuliah yang diajar di kelas ini
             $mataKuliah = Jadwal::where('dosen_id', $dosen->id)
                 ->where('kelas_id', $item->id)
@@ -55,7 +54,7 @@ class KelasController extends Controller
                 ->get()
                 ->pluck('mataKuliah')
                 ->unique('id')
-                ->map(function($mk) {
+                ->map(function ($mk) {
                     return [
                         'id' => $mk->id,
                         'nama' => $mk->nama_mk,
@@ -70,7 +69,7 @@ class KelasController extends Controller
 
             $item->mata_kuliah = $mataKuliah;
             $item->jumlah_mahasiswa = $jumlahMahasiswa;
-            
+
             return $item;
         });
 
@@ -86,7 +85,7 @@ class KelasController extends Controller
 
     public function mahasiswa($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -113,7 +112,7 @@ class KelasController extends Controller
             ->get()
             ->pluck('mataKuliah')
             ->unique('id')
-            ->map(function($mk) {
+            ->map(function ($mk) {
                 return [
                     'id' => $mk->id,
                     'nama' => $mk->nama_mk,
@@ -130,12 +129,12 @@ class KelasController extends Controller
             ->get();
 
         // Tambahkan statistik absensi dan nilai per mahasiswa
-        $mahasiswa = $mahasiswa->map(function($mhs) use ($mataKuliah) {
+        $mahasiswa = $mahasiswa->map(function ($mhs) use ($mataKuliah) {
             // Hitung statistik absensi
             $totalAbsensi = $mhs->absensi()->count();
             $hadirCount = $mhs->absensi()->where('status', 'Hadir')->count();
-            $persentaseKehadiran = $totalAbsensi > 0 
-                ? round(($hadirCount / $totalAbsensi) * 100, 1) 
+            $persentaseKehadiran = $totalAbsensi > 0
+                ? round(($hadirCount / $totalAbsensi) * 100, 1)
                 : 0;
 
             $mhs->statistik_absensi = [

@@ -11,14 +11,14 @@ use App\Models\Jadwal;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class NilaiController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -119,7 +119,7 @@ class NilaiController extends Controller
 
     public function create(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -252,7 +252,7 @@ class NilaiController extends Controller
 
     public function edit($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -330,7 +330,7 @@ class NilaiController extends Controller
 
     public function destroy($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         $nilai = Nilai::findOrFail($id);
@@ -352,7 +352,7 @@ class NilaiController extends Controller
 
     public function rekap(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -433,7 +433,7 @@ class NilaiController extends Controller
                         'mahasiswa_id' => $mhs->id,
                         'nim' => $mhs->nim,
                         'nama' => $mhs->nama,
-                        'kelas' => $mhs->kelas->nama_kelas ?? '-',
+                        'kelas' => $mhs->kelas?->nama_kelas ?? '-',
                         'tugas_avg' => round($tugasAvg, 2),
                         'uts_avg' => round($utsAvg, 2),
                         'uas_avg' => round($uasAvg, 2),

@@ -11,7 +11,6 @@ use App\Models\MataKuliah;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -19,7 +18,7 @@ class AbsensiController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -37,21 +36,21 @@ class AbsensiController extends Controller
             ->pluck('kelas_id');
 
         // Query absensi
-        $query = Absensi::whereHas('jadwal', function($q) use ($dosen) {
-                $q->where('dosen_id', $dosen->id);
-            })
+        $query = Absensi::whereHas('jadwal', function ($q) use ($dosen) {
+            $q->where('dosen_id', $dosen->id);
+        })
             ->with(['mahasiswa.prodi', 'jadwal.mataKuliah', 'jadwal.kelas']);
 
         // Filter by mata kuliah
         if ($request->filled('mata_kuliah_id')) {
-            $query->whereHas('jadwal', function($q) use ($request) {
+            $query->whereHas('jadwal', function ($q) use ($request) {
                 $q->where('mata_kuliah_id', $request->mata_kuliah_id);
             });
         }
 
         // Filter by kelas
         if ($request->filled('kelas_id')) {
-            $query->whereHas('jadwal', function($q) use ($request) {
+            $query->whereHas('jadwal', function ($q) use ($request) {
                 $q->where('kelas_id', $request->kelas_id);
             });
         }
@@ -69,16 +68,16 @@ class AbsensiController extends Controller
         // Search mahasiswa
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('mahasiswa', function($q) use ($search) {
+            $query->whereHas('mahasiswa', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nim', 'like', "%{$search}%");
+                    ->orWhere('nim', 'like', "%{$search}%");
             });
         }
 
         $absensi = $query->orderBy('tanggal', 'desc')->paginate(15);
 
         // Transform data
-        $absensi->getCollection()->transform(function($item) {
+        $absensi->getCollection()->transform(function ($item) {
             return [
                 'id' => $item->id,
                 'tanggal' => $item->tanggal->format('Y-m-d'),
@@ -128,7 +127,7 @@ class AbsensiController extends Controller
 
     public function create(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -139,7 +138,7 @@ class AbsensiController extends Controller
         $jadwalList = Jadwal::where('dosen_id', $dosen->id)
             ->with(['mataKuliah', 'kelas.prodi'])
             ->get()
-            ->map(function($jadwal) {
+            ->map(function ($jadwal) {
                 return [
                     'id' => $jadwal->id,
                     'mata_kuliah' => $jadwal->mataKuliah->nama_mk . ' (' . $jadwal->mataKuliah->kode_mk . ')',
@@ -160,12 +159,12 @@ class AbsensiController extends Controller
         $tanggal = $request->tanggal ?? now()->format('Y-m-d');
 
         $jadwal = Jadwal::with(['kelas', 'mataKuliah'])->findOrFail($jadwalId);
-        
+
         // Get mahasiswa di kelas ini
         $mahasiswa = Mahasiswa::where('kelas_id', $jadwal->kelas_id)
             ->orderBy('nim')
             ->get()
-            ->map(function($mhs) use ($jadwalId, $tanggal) {
+            ->map(function ($mhs) use ($jadwalId, $tanggal) {
                 // Cek apakah sudah ada absensi untuk tanggal ini
                 $existingAbsensi = Absensi::where('jadwal_id', $jadwalId)
                     ->where('mahasiswa_id', $mhs->id)
@@ -239,7 +238,7 @@ class AbsensiController extends Controller
 
     public function edit($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -283,7 +282,7 @@ class AbsensiController extends Controller
         ]);
 
         $absensi = Absensi::findOrFail($id);
-        
+
         $absensi->update([
             'status' => $request->status,
             'keterangan' => $request->keterangan,
@@ -295,7 +294,7 @@ class AbsensiController extends Controller
 
     public function destroy($id)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         $absensi = Absensi::findOrFail($id);
@@ -313,7 +312,7 @@ class AbsensiController extends Controller
 
     public function rekap(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -344,7 +343,7 @@ class AbsensiController extends Controller
         $mahasiswaList = $query->with(['prodi', 'kelas'])
             ->orderBy('nim')
             ->get()
-            ->map(function($mhs) use ($jadwalIds, $jadwalId, $bulan) {
+            ->map(function ($mhs) use ($jadwalIds, $jadwalId, $bulan) {
                 // Query absensi
                 $absensiQuery = Absensi::where('mahasiswa_id', $mhs->id)
                     ->whereIn('jadwal_id', $jadwalIds)
@@ -355,11 +354,11 @@ class AbsensiController extends Controller
                     $absensiQuery->where('jadwal_id', $jadwalId);
                 }
 
-                $totalAbsensi = $absensiQuery->count();
-                $hadir = $absensiQuery->where('status', 'Hadir')->count();
-                $izin = $absensiQuery->where('status', 'Izin')->count();
-                $sakit = $absensiQuery->where('status', 'Sakit')->count();
-                $alpa = $absensiQuery->where('status', 'Alpa')->count();
+                $totalAbsensi = (clone $absensiQuery)->count();
+                $hadir        = (clone $absensiQuery)->where('status', 'Hadir')->count();
+                $izin         = (clone $absensiQuery)->where('status', 'Izin')->count();
+                $sakit        = (clone $absensiQuery)->where('status', 'Sakit')->count();
+                $alpa         = (clone $absensiQuery)->where('status', 'Alpa')->count();
 
                 $persentase = $totalAbsensi > 0 ? round(($hadir / $totalAbsensi) * 100, 2) : 0;
 
@@ -389,7 +388,7 @@ class AbsensiController extends Controller
         $jadwalList = Jadwal::where('dosen_id', $dosen->id)
             ->with(['mataKuliah', 'kelas'])
             ->get()
-            ->map(function($jadwal) {
+            ->map(function ($jadwal) {
                 return [
                     'id' => $jadwal->id,
                     'label' => $jadwal->mataKuliah->nama_mk . ' - ' . $jadwal->kelas->nama_kelas,

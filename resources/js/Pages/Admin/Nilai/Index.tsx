@@ -87,7 +87,7 @@ interface Props {
     };
 }
 
-export default function Index({ nilai, mahasiswa, mataKuliah, prodi, kelas, filters, flash }: Props) {
+export default function Index({ nilai, prodi, kelas, filters, flash }: Props) {
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('darkMode');
@@ -116,13 +116,14 @@ export default function Index({ nilai, mahasiswa, mataKuliah, prodi, kelas, filt
         setShowToast(true);
     };
 
-    if (flash.success && !showToast) {
-        showToastMessage(flash.success, 'success');
-    }
-
-    if (flash.error && !showToast) {
-        showToastMessage(flash.error, 'error');
-    }
+    useEffect(() => {
+        if (flash.success) {
+            showToastMessage(flash.success, 'success');
+        }
+        if (flash.error) {
+            showToastMessage(flash.error, 'error');
+        }
+    }, [flash]);
 
     const handleFilterChange = (key: string, value: string) => {
         const params: any = { ...filters };

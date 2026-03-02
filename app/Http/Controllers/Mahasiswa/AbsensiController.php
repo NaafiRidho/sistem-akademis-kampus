@@ -9,13 +9,12 @@ use App\Models\Jadwal;
 use App\Models\MataKuliah;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AbsensiController extends Controller
 {
     public function index(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)
             ->with(['prodi', 'kelas'])
             ->first();
@@ -33,7 +32,7 @@ class AbsensiController extends Controller
 
         // Filter by mata kuliah
         if ($request->filled('mata_kuliah_id')) {
-            $query->whereHas('jadwal', function($q) use ($request) {
+            $query->whereHas('jadwal', function ($q) use ($request) {
                 $q->where('mata_kuliah_id', $request->mata_kuliah_id);
             });
         }
@@ -47,13 +46,13 @@ class AbsensiController extends Controller
         if ($request->filled('bulan')) {
             $bulan = $request->bulan;
             $query->whereYear('tanggal', substr($bulan, 0, 4))
-                  ->whereMonth('tanggal', substr($bulan, 5, 2));
+                ->whereMonth('tanggal', substr($bulan, 5, 2));
         }
 
         $absensi = $query->orderBy('tanggal', 'desc')->paginate(15);
 
         // Transform data
-        $absensi->getCollection()->transform(function($item) {
+        $absensi->getCollection()->transform(function ($item) {
             return [
                 'id' => $item->id,
                 'tanggal' => $item->tanggal->format('Y-m-d'),
@@ -90,7 +89,7 @@ class AbsensiController extends Controller
         $sakit = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Sakit')->count();
         $izin = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Izin')->count();
         $alpha = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Alpa')->count();
-        
+
         $persentaseKehadiran = $totalAbsensi > 0 ? round(($hadir / $totalAbsensi) * 100, 2) : 0;
 
         $stats = [
@@ -117,7 +116,7 @@ class AbsensiController extends Controller
 
     public function rekap(Request $request)
     {
-        $user = JWTAuth::user();
+        $user = auth('api')->user();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)
             ->with(['prodi', 'kelas'])
             ->first();
@@ -138,7 +137,7 @@ class AbsensiController extends Controller
         $bulan = $request->bulan ?? now()->format('Y-m');
 
         // Rekap per mata kuliah
-        $rekapPerMataKuliah = $mataKuliahList->map(function($mk) use ($mahasiswa, $bulan) {
+        $rekapPerMataKuliah = $mataKuliahList->map(function ($mk) use ($mahasiswa, $bulan) {
             // Get jadwal untuk mata kuliah ini
             $jadwalIds = Jadwal::where('kelas_id', $mahasiswa->kelas_id)
                 ->where('mata_kuliah_id', $mk->id)
