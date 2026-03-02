@@ -9,22 +9,22 @@ class Nilai extends Model
 {
     protected $table = 'nilai';
     protected $fillable = [
-        'mahasiswa_id', 
-        'mata_kuliah_id', 
-        'semester', 
+        'mahasiswa_id',
+        'mata_kuliah_id',
+        'semester',
         'tahun_ajaran',
-        'tugas', 
-        'uts', 
-        'uas', 
-        'nilai_akhir', 
+        'tugas',
+        'uts',
+        'uas',
+        'nilai_akhir',
         'grade'
     ];
 
     protected $casts = [
-        'tugas' => 'decimal:2',
-        'uts' => 'decimal:2',
-        'uas' => 'decimal:2',
-        'nilai_akhir' => 'decimal:2',
+        'tugas' => 'float',
+        'uts' => 'float',
+        'uas' => 'float',
+        'nilai_akhir' => 'float',
     ];
 
     public function mahasiswa(): BelongsTo

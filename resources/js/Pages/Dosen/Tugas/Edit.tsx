@@ -59,7 +59,7 @@ export default function Edit({ tugas, mataKuliahList = [] }: Props) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileName, setFileName] = useState("");
-    const [existingFile, setExistingFile] = useState(tugas.file_path || "");
+    const existingFile = tugas.file_path || "";
 
     useEffect(() => {
         if (darkMode) {

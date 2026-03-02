@@ -71,7 +71,7 @@ interface Props {
     };
 }
 
-export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
+export default function Index({ absensi, flash }: Props) {
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('darkMode');
@@ -200,15 +200,6 @@ export default function Index({ absensi, mahasiswa, jadwal, flash }: Props) {
         return badges[status as keyof typeof badges] || 'bg-gray-100 text-gray-800';
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-    };
 
     useEffect(() => {
         if (darkMode) {

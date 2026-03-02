@@ -43,7 +43,7 @@ interface Props {
     };
 }
 
-export default function KelasIndex({ kelas, dosen, filters }: Props) {
+export default function KelasIndex({ kelas, filters }: Props) {
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('darkMode');

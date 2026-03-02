@@ -54,17 +54,19 @@ class NilaiController extends Controller
             return [
                 'id' => $item->id,
                 'mata_kuliah' => [
-                    'id' => $item->mataKuliah->id,
-                    'nama' => $item->mataKuliah->nama_mk,
-                    'kode' => $item->mataKuliah->kode_mk,
-                    'sks' => $item->mataKuliah->sks,
+                    'id' => $item->mataKuliah->id ?? null,
+                    'nama' => $item->mataKuliah->nama_mk ?? '-',
+                    'kode' => $item->mataKuliah->kode_mk ?? '-',
+                    'sks' => $item->mataKuliah->sks ?? 0,
                 ],
                 'semester' => $item->semester,
                 'tahun_ajaran' => $item->tahun_ajaran,
-                'tugas' => $item->tugas,
-                'uts' => $item->uts,
-                'uas' => $item->uas,
-                'nilai_akhir' => $item->nilai_akhir,
+                // Cast to float — model uses decimal:2 cast (serializes as string)
+                // Frontend calls .toFixed(2) which requires Number type
+                'tugas' => $item->tugas !== null ? (float) $item->tugas : null,
+                'uts' => $item->uts !== null ? (float) $item->uts : null,
+                'uas' => $item->uas !== null ? (float) $item->uas : null,
+                'nilai_akhir' => $item->nilai_akhir !== null ? (float) $item->nilai_akhir : null,
                 'grade' => $item->grade,
             ];
         });

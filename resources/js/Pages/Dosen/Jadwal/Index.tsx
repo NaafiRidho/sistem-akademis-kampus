@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import DosenSidebar from '@/Components/Layout/DosenSidebar';
 import Header from '@/Components/Layout/Header';
 import { route } from '@/utils/route';
@@ -47,7 +47,7 @@ interface Props {
     };
 }
 
-export default function JadwalIndex({ jadwal, jadwalFlat, filter, tanggal, stats, dosen }: Props) {
+export default function JadwalIndex({ jadwal, jadwalFlat, filter, tanggal, stats }: Props) {
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('darkMode');
@@ -64,7 +64,7 @@ export default function JadwalIndex({ jadwal, jadwalFlat, filter, tanggal, stats
     });
 
     const [currentFilter, setCurrentFilter] = useState(filter);
-    const [currentDate, setCurrentDate] = useState(tanggal);
+    const currentDate = tanggal;
 
     useEffect(() => {
         if (darkMode) {

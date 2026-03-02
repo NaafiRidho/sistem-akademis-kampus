@@ -1,6 +1,15 @@
 import { router } from '@inertiajs/react';
 
-export default function Header({ sidebarOpen, setSidebarOpen, darkMode, setDarkMode, title, subtitle }) {
+interface HeaderProps {
+    sidebarOpen: boolean;
+    setSidebarOpen: (open: boolean) => void;
+    darkMode: boolean;
+    setDarkMode: (dark: boolean) => void;
+    title: string;
+    subtitle?: string;
+}
+
+export default function Header({ sidebarOpen, setSidebarOpen, darkMode, setDarkMode, title, subtitle }: HeaderProps) {
     const handleLogout = () => {
         router.post('/logout');
     };

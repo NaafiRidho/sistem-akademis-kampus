@@ -53,7 +53,7 @@ interface Props {
     };
 }
 
-export default function JadwalIndex({ mahasiswa, jadwal, jadwalGrouped, filters }: Props) {
+export default function JadwalIndex({ jadwal, jadwalGrouped, filters }: Props) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
     const [selectedHari, setSelectedHari] = useState(filters.hari || '');

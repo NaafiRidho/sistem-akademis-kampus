@@ -138,15 +138,6 @@ export default function AbsensiCreate({ jadwalList }: Props) {
         });
     };
 
-    const getStatusBadge = (status: string) => {
-        const badges: Record<string, string> = {
-            'Hadir': 'bg-green-500',
-            'Izin': 'bg-blue-500',
-            'Sakit': 'bg-yellow-500',
-            'Alpa': 'bg-red-500',
-        };
-        return badges[status] || 'bg-gray-500';
-    };
 
     return (
         <div className={darkMode ? 'dark' : ''}>

@@ -23,10 +23,10 @@ export default function Login() {
         } else {
             document.documentElement.classList.remove('dark');
         }
-        localStorage.setItem('darkMode', darkMode);
+        localStorage.setItem('darkMode', String(darkMode));
     }, [darkMode]);
 
-    const submit = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/login');
     };

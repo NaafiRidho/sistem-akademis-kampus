@@ -51,7 +51,6 @@ interface PageProps {
 export default function DosenIndex({ dosen, prodis, filters }: PageProps) {
     const page = usePage();
     const props = page.props as any;
-    const flash = props.flash as { success?: string; error?: string; import_errors?: string[] };
     
     const [showToast, setShowToast] = useState(false);
     const [toastConfig, setToastConfig] = useState<{ type: string; message: string; details: string[] }>({ 

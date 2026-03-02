@@ -56,19 +56,22 @@ class AbsensiController extends Controller
             return [
                 'id' => $item->id,
                 'tanggal' => $item->tanggal->format('Y-m-d'),
-                'hari' => $item->tanggal->locale('id')->dayName,
+                'hari' => $item->jadwal->hari,
+                'pertemuan_ke' => $item->pertemuan_ke ?? '-',
                 'status' => $item->status,
                 'keterangan' => $item->keterangan,
                 'mata_kuliah' => [
                     'id' => $item->jadwal->mataKuliah->id,
                     'nama' => $item->jadwal->mataKuliah->nama_mk,
                     'kode' => $item->jadwal->mataKuliah->kode_mk,
+                    'sks' => $item->jadwal->mataKuliah->sks ?? 0,
                 ],
                 'dosen' => [
-                    'id' => $item->jadwal->dosen->id,
-                    'nama' => $item->jadwal->dosen->nama,
+                    'id' => $item->jadwal->dosen->id ?? null,
+                    'nama' => $item->jadwal->dosen->nama ?? '-',
                 ],
                 'jadwal' => [
+                    'hari' => $item->jadwal->hari,
                     'jam_mulai' => date('H:i', strtotime($item->jadwal->jam_mulai)),
                     'jam_selesai' => date('H:i', strtotime($item->jadwal->jam_selesai)),
                 ],
@@ -97,7 +100,7 @@ class AbsensiController extends Controller
             'hadir' => $hadir,
             'sakit' => $sakit,
             'izin' => $izin,
-            'alpha' => $alpha,
+            'alpa' => $alpha,
             'persentase_kehadiran' => $persentaseKehadiran,
         ];
 
@@ -105,11 +108,11 @@ class AbsensiController extends Controller
             'mahasiswa' => $mahasiswa,
             'absensi' => $absensi,
             'mataKuliahList' => $mataKuliahList,
-            'stats' => $stats,
+            'statistik' => $stats,
             'filters' => [
                 'mata_kuliah_id' => $request->mata_kuliah_id,
                 'status' => $request->status,
-                'bulan' => $request->bulan ?? now()->format('Y-m'),
+                'bulan' => $request->bulan,
             ],
         ]);
     }
@@ -191,7 +194,7 @@ class AbsensiController extends Controller
                 'sakit' => $sakit,
                 'izin' => $izin,
                 'alpa' => $alpa,
-                'persentase' => $persentase,
+                'persentase_kehadiran' => $persentase,
             ];
         });
 

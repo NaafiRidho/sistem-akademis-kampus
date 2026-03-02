@@ -65,7 +65,6 @@ export default function Index({ tugas, mataKuliahList, filters }: Props) {
     const [selectedMataKuliah, setSelectedMataKuliah] = useState(
         filters.mata_kuliah_id || ""
     );
-    const [deleteId, setDeleteId] = useState<number | null>(null);
 
     useEffect(() => {
         if (darkMode) {
@@ -97,9 +96,6 @@ export default function Index({ tugas, mataKuliahList, filters }: Props) {
         if (confirm("Apakah Anda yakin ingin menghapus tugas ini?")) {
             router.delete(`/dosen/tugas/${id}`, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    setDeleteId(null);
-                },
             });
         }
     };

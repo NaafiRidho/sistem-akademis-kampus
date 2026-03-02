@@ -65,7 +65,7 @@ interface Props {
     };
 }
 
-export default function KelasMahasiswa({ kelas, mahasiswa, mata_kuliah, dosen }: Props) {
+export default function KelasMahasiswa({ kelas, mahasiswa, mata_kuliah }: Props) {
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('darkMode');

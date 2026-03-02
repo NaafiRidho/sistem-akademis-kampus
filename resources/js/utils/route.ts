@@ -4,7 +4,7 @@ declare global {
     }
 }
 
-export function route(name: string, params?: any, absolute?: boolean): string {
+export function route(name: string, params?: any, _absolute?: boolean): string {
     // Fallback routes map
     const routes: { [key: string]: string } = {
         'dosen.jadwal.index': '/dosen/jadwal',
