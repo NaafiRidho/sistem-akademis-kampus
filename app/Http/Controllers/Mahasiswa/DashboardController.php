@@ -13,12 +13,13 @@ use App\Models\PengumpulanTugas;
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)
             ->with(['prodi.fakultas', 'kelas'])
             ->first();
@@ -54,7 +55,7 @@ class DashboardController extends Controller
         $hadir = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Hadir')->count();
         $sakit = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Sakit')->count();
         $izin = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Izin')->count();
-        $alpha = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Alpha')->count();
+        $alpha = Absensi::where('mahasiswa_id', $mahasiswa->id)->where('status', 'Alpa')->count();
 
         $persentaseKehadiran = $totalAbsensi > 0 ? round(($hadir / $totalAbsensi) * 100, 2) : 0;
 

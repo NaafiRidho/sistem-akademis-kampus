@@ -11,12 +11,13 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class TugasController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -92,7 +93,7 @@ class TugasController extends Controller
 
     public function show($id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -126,7 +127,7 @@ class TugasController extends Controller
 
     public function submit(Request $request, $id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -177,7 +178,7 @@ class TugasController extends Controller
 
     public function download($id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {
@@ -204,7 +205,7 @@ class TugasController extends Controller
 
     public function downloadPengumpulan($id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
 
         if (!$mahasiswa) {

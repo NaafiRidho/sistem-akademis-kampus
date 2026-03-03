@@ -9,12 +9,13 @@ use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class KelasController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -85,7 +86,7 @@ class KelasController extends Controller
 
     public function mahasiswa($id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {

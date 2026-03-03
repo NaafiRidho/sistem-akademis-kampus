@@ -11,12 +11,13 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MateriController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -95,7 +96,7 @@ class MateriController extends Controller
 
     public function create()
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -148,7 +149,7 @@ class MateriController extends Controller
 
     public function store(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -189,7 +190,7 @@ class MateriController extends Controller
 
     public function destroy($id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -221,7 +222,7 @@ class MateriController extends Controller
 
     public function download($id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {

@@ -13,12 +13,13 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AbsensiController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -127,7 +128,7 @@ class AbsensiController extends Controller
 
     public function create(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -238,7 +239,7 @@ class AbsensiController extends Controller
 
     public function edit($id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {
@@ -294,7 +295,7 @@ class AbsensiController extends Controller
 
     public function destroy($id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         $absensi = Absensi::findOrFail($id);
@@ -312,7 +313,7 @@ class AbsensiController extends Controller
 
     public function rekap(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->first();
 
         if (!$dosen) {

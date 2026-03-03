@@ -11,12 +11,13 @@ use App\Models\MataKuliah;
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $dosen = Dosen::where('user_id', $user->id)->with('prodi')->first();
 
         if (!$dosen) {

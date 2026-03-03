@@ -9,12 +9,13 @@ use App\Models\Jadwal;
 use App\Models\MataKuliah;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AbsensiController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)
             ->with(['prodi', 'kelas'])
             ->first();
@@ -119,7 +120,7 @@ class AbsensiController extends Controller
 
     public function rekap(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $mahasiswa = Mahasiswa::where('user_id', $user->id)
             ->with(['prodi', 'kelas'])
             ->first();

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class PengumumanController extends Controller
 {
@@ -14,7 +15,7 @@ class PengumumanController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
 
         $query = Pengumuman::query()
             ->whereIn('target_role', ['Dosen', 'Semua']);
@@ -67,7 +68,7 @@ class PengumumanController extends Controller
      */
     public function show(string $id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $pengumuman = Pengumuman::findOrFail($id);
 
         // Mark as read
@@ -83,7 +84,7 @@ class PengumumanController extends Controller
      */
     public function markAsRead(string $id)
     {
-        $user = auth('api')->user();
+        $user = JWTAuth::parseToken()->authenticate();
         $pengumuman = Pengumuman::findOrFail($id);
 
         $pengumuman->markAsReadBy($user);
